@@ -18,9 +18,9 @@ import static javax.management.remote.JMXConnectorFactory.connect;
  */
 public class Pcc_defines {
 
-        private static final String driverName = "org.apache.derby.jdbc.EmbeddedDriver";
-        private static final String clientDriverName = "org.apache.derby.jdbc.ClientDriver";
-        private static final String databaseConnectionName = "jdbc:derby://localhost:1527/pcc;create=true";
+        private static String driverName = "org.apache.derby.jdbc.EmbeddedDriver";
+        private static String clientDriverName = "org.apache.derby.jdbc.ClientDriver";
+        private static String databaseConnectionName = "jdbc:derby://localhost:1527/pcc;create=true";
         private static Object LocalDateTime;
     /**
      * @param args the command line arguments
@@ -52,6 +52,7 @@ public class Pcc_defines {
             throw e;
         }
     
+        // xxx
         //Try to connect to the specified database
         try{
             
@@ -69,21 +70,29 @@ public class Pcc_defines {
             stmt = connection.createStatement();
             ResultSet rs;
             
+            Integer totalct = 0;
+            
             // Generate #defines for NUMBER_TYPE table
-            gendefines_Canid(stmt);
+            totalct += gendefines_Canid(stmt);
 
             // Generate #defines for NUMBER_TYPE table
-            gendefines_Number_type(stmt);
+            totalct += gendefines_Number_type(stmt);
             
             // Generate #defines for CMD_CODES table
-            gendefines_Cmd_codes(stmt);
+            totalct += gendefines_Cmd_codes(stmt);
             
             // Generate #defines for PAYLOAD_TYPE table
-            gendefines_Payload_type(stmt);
-                     
-           // Generate #defines for PARAM_TYPE table
-            gendefines_Param_List(stmt);
+            totalct += gendefines_Payload_type(stmt);
+
+            // Generate #defines for PARAM_LIST table
+            totalct += gendefines_Param_List(stmt);
+
+            // Generate #defines for PARAM_LIST table
+            totalct += gendefines_Readings_List(stmt);
             
+            System.out.format("\n/* TOTAL COUNT OF #defines = %d  */\n",totalct);
+            
+            System.out.println("/* Test 3\n");
         }
         catch(SQLException e) {
             //TODO Fix error handling
@@ -97,14 +106,14 @@ public class Pcc_defines {
         }
     }
    
-        private static void gendefines_Canid(Statement stmt) throws SQLException{
+        private static int gendefines_Canid(Statement stmt) throws SQLException{
             String query = "select * from CANID ";        
         
             ResultSet rs;
             rs = stmt.executeQuery(query);
             Integer count = 0;
             while (rs.next()) {count += 1;}
-            System.out.format("\n#define CANID_TOTAL_COUNT %d\n",count);
+            System.out.format("\n#define CANID_COUNT %d\n",count);
             
             rs = stmt.executeQuery(query);
             
@@ -114,15 +123,16 @@ public class Pcc_defines {
                 System.out.format("// " + "%-15s: ",     rs.getString("CANID_TYPE"));
                 System.out.format("%s" + "\n",         rs.getString("DESCRIPTION"));
             }
+            return count;
         }
-         private static void gendefines_Number_type(Statement stmt) throws SQLException{
+         private static int gendefines_Number_type(Statement stmt) throws SQLException{
              String query = "select * from APP.NUMBER_TYPE ";        
         
             ResultSet rs;
             rs = stmt.executeQuery(query);
             Integer count = 0;
             while (rs.next()) {count += 1;}
-            System.out.format("\n#define NUMBER_TYPE_TOTAL_COUNT %d\n",count);
+            System.out.format("\n#define NUMBER_TYPE_COUNT %d\n",count);
             
             rs = stmt.executeQuery(query);
             
@@ -132,15 +142,16 @@ public class Pcc_defines {
                  System.out.format("// " + "%-12s",rs.getString("TYPE_CT"));
                  System.out.format("%s" + "\n",rs.getString("DESCRIPTION"));
              }
+             return count;
          }
-        private static void gendefines_Cmd_codes(Statement stmt) throws SQLException{
+        private static int gendefines_Cmd_codes(Statement stmt) throws SQLException{
              String query = "select * from APP.CMD_CODES ";        
         
             ResultSet rs;
             rs = stmt.executeQuery(query);
             Integer count = 0;
             while (rs.next()) {count += 1;}
-            System.out.format("\n#define CMD_CODES_TOTAL_COUNT %d\n",count);
+            System.out.format("\n#define CMD_CODES_COUNT %d\n",count);
             
             rs = stmt.executeQuery(query);
             
@@ -149,15 +160,16 @@ public class Pcc_defines {
                  System.out.format("%-10s",rs.getString("CMD_CODE_NUMBER"));
                  System.out.format("// " + "%-12s\n",rs.getString("DESCRIPTION"));
              }
+             return count;
          }
-        private static void gendefines_Payload_type(Statement stmt) throws SQLException{
+        private static int gendefines_Payload_type(Statement stmt) throws SQLException{
             String query = "select * from PAYLOAD_TYPE ";        
         
             ResultSet rs;
             rs = stmt.executeQuery(query);
             Integer count = 0;
             while (rs.next()) {count += 1;}
-            System.out.format("\n#define PAYLOAD_TYPE_TOTAL_COUNT %d\n",count);
+            System.out.format("\n#define PAYLOAD_TYPE_COUNT %d\n",count);
             
             rs = stmt.executeQuery(query);
             
@@ -166,23 +178,61 @@ public class Pcc_defines {
                 System.out.format("%-10s",             rs.getString("PAYLOAD_TYPE_CODE"));
                 System.out.format("// " + "%-48s\n",     rs.getString("DESCRIPTION"));
             }
+            return count;
         }
-        private static void gendefines_Param_List(Statement stmt) throws SQLException{
+        
+       private static int gendefines_Param_List(Statement stmt) throws SQLException{
             String query = "select * from PARAM_LIST ";        
         
             ResultSet rs;
             rs = stmt.executeQuery(query);
             Integer count = 0;
+            Integer count1 = 0;
+            Integer flag = 0;
             while (rs.next()) {count += 1;}
-            System.out.format("\n#define PARAM_LIST_TOTAL_COUNT %d\n",count);
+            System.out.format("\n#define PARAM_LIST_COUNT %d\t// TOTAL COUNT OF PARAMETER LIST\n\n",count);
+            
+            rs = stmt.executeQuery(query);
+            String old = "";
+            String tmp;
+            
+            while (rs.next()) {
+                tmp = rs.getString("FUNCTION_TYPE");
+                if (!(tmp .equals(old))){
+                    if (flag == 0){
+                        flag = 1;
+                    }else{
+                        System.out.format("\n#define PARAM_LIST_CT_%s\t%d\t// Count of same FUNCTION_TYPE in preceing list\n\n",old, count1);
+                        count1 = 0;
+                    }
+                }
+                old = tmp;
+                System.out.format("#define  " + "%-24s\t",rs.getString("PARAM_NAME"));
+                System.out.format("%-10s",                rs.getString("PARAM_CODE"));
+                System.out.format("// " + "%-48s\n",      rs.getString("DESCRIPTION"));
+                count1 += 1;
+            }
+            System.out.format("\n#define PARAM_LIST_CT_%s\t%d\t// Count of same FUNCTION_TYPE in preceding list\n\n",old, count1);            
+            return count;
+        }    
+       
+       private static int gendefines_Readings_List(Statement stmt) throws SQLException{
+            String query = "select * from READINGS_LIST ";        
+        
+            ResultSet rs;
+            rs = stmt.executeQuery(query);
+            Integer count = 0;
+            while (rs.next()) {count += 1;}
+            System.out.format("\n#define READINGS_LIST_COUNT %d\n",count);
             
             rs = stmt.executeQuery(query);
             
             while (rs.next()) {
-                System.out.format("#define  " + "%-24s", rs.getString("PARAM_NAME"));
-                System.out.format("%-10s",               rs.getString("PARAM_CODE"));
-                System.out.format("\t// %-14s",               rs.getString("FUNCTION_TYPE"));
-                System.out.format("%-48s\n",     rs.getString("DESCRIPTION"));                
+                System.out.format("#define  " + "%-24s\t",rs.getString("READINGS_NAME"));
+                System.out.format("%-10s",                rs.getString("READINGS_CODE"));
+                System.out.format("// " + "%-48s\n",      rs.getString("DESCRIPTION"));
             }
-        }
+            return count;
+        }   
+        
 }

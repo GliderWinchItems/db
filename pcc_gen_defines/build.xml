@@ -7,8 +7,8 @@
 <!-- the Compile on Save feature is turned off for the project. -->
 <!-- You can turn off the Compile on Save (or Deploy on Save) setting -->
 <!-- in the project's Project Properties dialog box.-->
-<project name="Pcc_gen_defines" default="default" basedir=".">
-    <description>Builds, tests, and runs the project Pcc_gen_defines.</description>
+<project name="pcc_gen_defines" default="default" basedir=".">
+    <description>Builds, tests, and runs the project pcc_gen_defines.</description>
     <import file="nbproject/build-impl.xml"/>
     <!--
 
@@ -58,7 +58,7 @@
 
     An example of overriding the target for project execution could look like this:
 
-        <target name="run" depends="Pcc_gen_defines-impl.jar">
+        <target name="run" depends="pcc_gen_defines-impl.jar">
             <exec dir="bin" executable="launcher.exe">
                 <arg file="${dist.jar}"/>
             </exec>
