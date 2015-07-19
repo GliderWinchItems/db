@@ -20,7 +20,7 @@ public class Pcc_defines {
 
         private static String driverName = "org.apache.derby.jdbc.EmbeddedDriver";
         private static String clientDriverName = "org.apache.derby.jdbc.ClientDriver";
-        private static String databaseConnectionName = "jdbc:derby://localhost:1527/pcc;create=true";
+        private static String databaseConnectionName = "jdbc:derby://localhost:1527/pcc";
         private static Object LocalDateTime;
     /**
      * @param args the command line arguments
@@ -60,8 +60,8 @@ public class Pcc_defines {
             java.util.Date date= new java.util.Date();
             System.out.format("// %s\n",new Timestamp(date.getTime()));
 
-            System.out.println("#ifndef  DATABASE_DEFINES");
-            System.out.println("#define  DATABASE_DEFINES\n");
+//            System.out.println("#ifndef  DATABASE_DEFINES");
+//            System.out.println("#define  DATABASE_DEFINES\n");
 
             
             connection = DriverManager.getConnection(databaseConnectionName);
@@ -90,9 +90,13 @@ public class Pcc_defines {
             // Generate #defines for PARAM_LIST table
             totalct += gendefines_Readings_List(stmt);
             
-            System.out.format("\n/* TOTAL COUNT OF #defines = %d  */\n",totalct);
+            // Generate #defines for PARAM_LIST table
+            totalct += gendefines_Func_Bit_Param(stmt);            
             
-            System.out.println("/* Test 3\n");
+            System.out.format("\n/* TOTAL COUNT OF #defines = %d  */\n",totalct);
+//            System.out.println("#endif\n");            
+            
+            System.out.println("/* Test 8 */\n");
         }
         catch(SQLException e) {
             //TODO Fix error handling
@@ -119,7 +123,7 @@ public class Pcc_defines {
             
             while (rs.next()) {
                 System.out.format("#define  " + "%-24s",rs.getString("CANID_NAME"));
-                System.out.format("%-10s",             rs.getString("CANID_HEX"));
+                System.out.format(" 0x%-10s",             rs.getString("CANID_HEX"));
                 System.out.format("// " + "%-15s: ",     rs.getString("CANID_TYPE"));
                 System.out.format("%s" + "\n",         rs.getString("DESCRIPTION"));
             }
@@ -234,5 +238,23 @@ public class Pcc_defines {
             }
             return count;
         }   
+       private static int gendefines_Func_Bit_Param(Statement stmt) throws SQLException{
+            String query = "select * from FUNC_BIT_PARAM";        
         
+            ResultSet rs;
+            rs = stmt.executeQuery(query);
+            Integer count = 0;
+            while (rs.next()) {count += 1;}
+            System.out.format("\n#define FUNC_BIT_PARAM_COUNT %d\n",count);
+            
+            rs = stmt.executeQuery(query);
+            
+            while (rs.next()) {
+                System.out.format("#define  " + "%-24s\t",rs.getString("FUNC_BIT_PARAM_NAME"));
+                System.out.format("%-10s",                rs.getString("FUNC_BIT_PARAM_VAL"));
+                System.out.format("// " + "%-20s",        rs.getString("FUNCTION_TYPE"));
+                System.out.format("%-48s\n",              rs.getString("DESCRIPTION"));
+            }
+            return count;
+        }           
 }
