@@ -96,7 +96,7 @@ public class Pcc_defines {
             System.out.format("\n/* TOTAL COUNT OF #defines = %d  */\n",totalct);
 //            System.out.println("#endif\n");            
             
-            System.out.println("/* Test 8 */\n");
+            System.out.println("/* Test 9 */\n");
         }
         catch(SQLException e) {
             //TODO Fix error handling
@@ -206,7 +206,7 @@ public class Pcc_defines {
                     if (flag == 0){
                         flag = 1;
                     }else{
-                        System.out.format("\n#define PARAM_LIST_CT_%s\t%d\t// Count of same FUNCTION_TYPE in preceing list\n\n",old, count1);
+                        System.out.format("\n#define PARAM_LIST_CT_%s\t%d\t// Count of same FUNCTION_TYPE in preceding list\n\n",old, count1);
                         count1 = 0;
                     }
                 }
@@ -253,6 +253,25 @@ public class Pcc_defines {
                 System.out.format("#define  " + "%-24s\t",rs.getString("FUNC_BIT_PARAM_NAME"));
                 System.out.format("%-10s",                rs.getString("FUNC_BIT_PARAM_VAL"));
                 System.out.format("// " + "%-20s",        rs.getString("FUNCTION_TYPE"));
+                System.out.format("%-48s\n",              rs.getString("DESCRIPTION"));
+            }
+            return count;
+        } 
+        private static int gendefines_CanUnit(Statement stmt) throws SQLException{
+            String query = "select * from CAN_UNIT_NAME";        
+        
+            ResultSet rs;
+            rs = stmt.executeQuery(query);
+            Integer count = 0;
+            while (rs.next()) {count += 1;}
+            System.out.format("\n#define CANUNIT_COUNT %d\n",count);
+            
+            rs = stmt.executeQuery(query);
+            
+            while (rs.next()) {
+                System.out.format("#define  " + "%-24s\t",rs.getString("CAN_UNIT_NAME"));
+                System.out.format("%-10s",                rs.getString("CAN_UNIT_CODE"));
+                System.out.format("// " + "%-20s",        rs.getString("CANID_NAME"));
                 System.out.format("%-48s\n",              rs.getString("DESCRIPTION"));
             }
             return count;
