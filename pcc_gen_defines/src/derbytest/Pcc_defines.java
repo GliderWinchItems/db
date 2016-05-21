@@ -91,7 +91,13 @@ public class Pcc_defines {
             totalct += gendefines_Readings_List(stmt);
             
             // Generate #defines for PARAM_LIST table
-            totalct += gendefines_Func_Bit_Param(stmt);            
+            totalct += gendefines_Func_Bit_Param(stmt);   
+            
+            // Generate #defines for PARAM_LIST table
+            totalct += gendefines_Functions_Type(stmt);      
+            
+ //          // Generate #defines for PARAM_LIST table
+//            totalct += gendefines_CanUnit(stmt);         
             
             System.out.format("\n/* TOTAL COUNT OF #defines = %d  */\n",totalct);
 //            System.out.println("#endif\n");            
@@ -258,7 +264,7 @@ public class Pcc_defines {
             return count;
         } 
         private static int gendefines_CanUnit(Statement stmt) throws SQLException{
-            String query = "select * from CAN_UNIT_NAME";        
+            String query = "select * from CAN_UNIT";        
         
             ResultSet rs;
             rs = stmt.executeQuery(query);
@@ -273,6 +279,24 @@ public class Pcc_defines {
                 System.out.format("%-10s",                rs.getString("CAN_UNIT_CODE"));
                 System.out.format("// " + "%-20s",        rs.getString("CANID_NAME"));
                 System.out.format("%-48s\n",              rs.getString("DESCRIPTION"));
+            }
+            return count;
+        }    
+                private static int gendefines_Functions_Type(Statement stmt) throws SQLException{
+            String query = "select * from FUNCTION_TYPE";        
+        
+            ResultSet rs;
+            rs = stmt.executeQuery(query);
+            Integer count = 0;
+            while (rs.next()) {count += 1;}
+            System.out.format("\n#define FUNCTION_TYPE_COUNT %d\n",count);
+            
+            rs = stmt.executeQuery(query);
+            
+            while (rs.next()) {
+                System.out.format("#define  FUNCTION_TYPE_" + "%-24s\t",rs.getString("FUNCTION_TYPE"));
+                System.out.format("%-10s",                rs.getInt("FUNCTION_TYPE_CODE"));
+                System.out.format("// " + "%-48s\n",              rs.getString("DESCRIPTION"));
             }
             return count;
         }           
