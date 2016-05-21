@@ -191,14 +191,16 @@ tmpsave = tmp;
 //                + "ON FUNCTION_CODES.FUNCTION_NAME = FUNCTIONS.FUNCTION_NAME\n"
 //        + "ORDER BY FUNCTIONS.CAN_UNIT_NAME";
             
-        String query3 = "SELECT FUNCTIONS.*,FUNCTION_CODES.*,CANID.CANID_HEX \n"
+        String query3 = "SELECT FUNCTIONS.*,FUNCTION_CODES.*,CANID.CANID_HEX,FUNCTION_TYPE.FUNCTION_TYPE_CODE \n"
             + "FROM FUNCTIONS \n"
             + "JOIN FUNCTION_CODES \n"
                 +  "ON FUNCTION_CODES.FUNCTION_NAME = FUNCTIONS.FUNCTION_NAME\n"
-                    + "JOIN CAN_UNIT \n"
-                        + "ON CAN_UNIT.CAN_UNIT_NAME = FUNCTIONS.CAN_UNIT_NAME\n"
-                            + "JOIN CANID \n"
-                                + "ON CANID.CANID_NAME = CAN_UNIT.CANID_NAME\n"
+            + "JOIN CAN_UNIT \n"
+                + "ON CAN_UNIT.CAN_UNIT_NAME = FUNCTIONS.CAN_UNIT_NAME\n"
+            + "JOIN CANID \n"
+                + "ON CANID.CANID_NAME = CAN_UNIT.CANID_NAME\n"
+            + "JOIN FUNCTION_TYPE \n"
+                + "ON FUNCTION_TYPE.FUNCTION_TYPE = FUNCTION_CODES.FUNCTION_TYPE \n"   
         + "ORDER BY FUNCTIONS.CAN_UNIT_NAME";
           
             
@@ -261,7 +263,7 @@ tmpsave = tmp;
                 String y = "";
                 y = getCANID(stmt2, val);
                 count += 1;
-                System.out.format("{%4d,  0x%s }, /* %3d ",rs.getInt("FUNCTION_CODE"),y, count);
+                System.out.format("{%4d,  0x%s }, /* %3d ",rs.getInt("FUNCTION_TYPE_CODE"),y, count);
                 System.out.format("%-18s ",rs.getString("CAN_UNIT_NAME"));
                 System.out.format("  %s\t", val);
                 System.out.format(" %-30s*/\n",rs.getString("DESCRIPTION"));
