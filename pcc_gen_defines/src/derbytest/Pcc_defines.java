@@ -87,22 +87,22 @@ public class Pcc_defines {
             // Generate #defines for PARAM_LIST table
             totalct += gendefines_Param_List(stmt);
 
-            // Generate #defines for PARAM_LIST table
+            // Generate #defines for READINGS_LIST table
             totalct += gendefines_Readings_List(stmt);
             
-            // Generate #defines for PARAM_LIST table
+            // Generate #defines for FUNC_BIT_PARAM table
             totalct += gendefines_Func_Bit_Param(stmt);   
             
-            // Generate #defines for PARAM_LIST table
+            // Generate #defines for FUNCTIONS_TYPE table
             totalct += gendefines_Functions_Type(stmt);      
             
- //          // Generate #defines for PARAM_LIST table
-//            totalct += gendefines_CanUnit(stmt);         
+            // Generate #defines for READINGS_BOARD table
+            totalct += gendefines_Readings_Board(stmt);         
             
             System.out.format("\n/* TOTAL COUNT OF #defines = %d  */\n",totalct);
 //            System.out.println("#endif\n");            
             
-            System.out.println("/* Test 9 */\n");
+            System.out.println("/* Test 2016/06/12 */\n");
         }
         catch(SQLException e) {
             //TODO Fix error handling
@@ -282,7 +282,7 @@ public class Pcc_defines {
             }
             return count;
         }    
-                private static int gendefines_Functions_Type(Statement stmt) throws SQLException{
+        private static int gendefines_Functions_Type(Statement stmt) throws SQLException{
             String query = "select * from FUNCTION_TYPE";        
         
             ResultSet rs;
@@ -296,6 +296,24 @@ public class Pcc_defines {
             while (rs.next()) {
                 System.out.format("#define  FUNCTION_TYPE_" + "%-24s\t",rs.getString("FUNCTION_TYPE"));
                 System.out.format("%-10s",                rs.getInt("FUNCTION_TYPE_CODE"));
+                System.out.format("// " + "%-48s\n",              rs.getString("DESCRIPTION"));
+            }
+            return count;
+        }  
+        private static int gendefines_Readings_Board(Statement stmt) throws SQLException{
+            String query = "select * from READINGS_BOARD";        
+        
+            ResultSet rs;
+            rs = stmt.executeQuery(query);
+            Integer count = 0;
+            while (rs.next()) {count += 1;}
+            System.out.format("\n#define READINGS_BOARD_COUNT %d\n",count);
+            
+            rs = stmt.executeQuery(query);
+            
+            while (rs.next()) {
+                System.out.format("#define  " + "%-24s\t",rs.getString("READINGS_BOARDNAME"));
+                System.out.format("%-10s",                rs.getInt("READINGS_BOARDCODE"));
                 System.out.format("// " + "%-48s\n",              rs.getString("DESCRIPTION"));
             }
             return count;
