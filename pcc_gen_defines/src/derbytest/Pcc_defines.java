@@ -283,7 +283,7 @@ public class Pcc_defines {
             return count;
         }    
         private static int gendefines_Functions_Type(Statement stmt) throws SQLException{
-            String query = "select * from FUNCTION_TYPE";        
+            String query = "select * from FUNCTIONS_TYPE";        
         
             ResultSet rs;
             rs = stmt.executeQuery(query);
