@@ -222,7 +222,7 @@ public class Pcc_defines {
                 System.out.format("// " + "%-48s\n",      rs.getString("DESCRIPTION"));
                 count1 += 1;
             }
-            System.out.format("\n#define PARAM_LIST_CT_%s\t%d\t// Count of same FUNCTION_TYPE in preceding list\n\n",old, count1);            
+            System.out.format("\n#define PARAM_LIST_CT_%s\t%d\t// Count of same FUNCTIONSTYPE in preceding list\n\n",old, count1);            
             return count;
         }    
        
@@ -283,7 +283,7 @@ public class Pcc_defines {
             return count;
         }    
         private static int gendefines_Functions_Type(Statement stmt) throws SQLException{
-            String query = "select * from FUNCTION_TYPE";        
+            String query = "select * from FUNCTIONS_TYPE";        
         
             ResultSet rs;
             rs = stmt.executeQuery(query);
