@@ -1,0 +1,9 @@
+Seems to have made the database connection
+
+ 1 CANID_TIME_SYNC         00200000  LAUNCH      Logging Time Sync msg
+ 2 CANID_FIX_LATLON        A1C00000  LAUNCH      GPS: winch latitude/longitude
+ 3 CANID_FIX_HT_TYPE_NSAT  B1C00000  LAUNCH      Height; fix-type; number satellites
+ 4 CANID_LOG_ER1           D1C0000C  LAUNCH      GPS checksum error ct
+ 5 CANID_LOG_ER2           D1C0001C  LAUNCH      GPS fix error
+ 6 CANID_LOG_ER3           D1C0002C  LAUNCH      GPS Time out of sync
+derbytest.Canid[ canidName=null ]
