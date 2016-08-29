@@ -98,12 +98,29 @@ ORDER BY CANID.CANID_HEX;
             int count = 0;
             
             while (rs.next()) {
+                /*
                 System.out.format("%-24s",rs.getString("CANID_NAME"));
                 System.out.format(" 0x%-10s",             rs.getString("CANID_HEX"));
                 System.out.format("// " + "%-15s: ",     rs.getString("CANID_TYPE"));
                 System.out.format("%s" + "\n",         rs.getString("DESCRIPTION"));
+                */
                 count += 1;
+                Canmsginfo cmi1 = new Canmsginfo ();
+                cmi1 = fillCanlist(rs);
+                System.out.format("0x%08X %3d %s\t%s %s\n",cmi1.can_hex,cmi1.pay_type_code,cmi1.can_msg_fmt,cmi1.descript_canid,
+                        cmi1.descript_payload);
             }
                        System.out.format("\n/* TOTAL COUNT OF #defines = %d  */\n",count);
         }
+    private static Canmsginfo fillCanlist(ResultSet rs) throws SQLException{
+        Canmsginfo cmi = new Canmsginfo(
+                rs.getString("CANID_HEX"),
+                rs.getInt   ("PAYLOAD_TYPE_CODE"),
+                rs.getString("CAN_MSG_FMT"),
+                rs.getString("CANID_NAME"),
+                rs.getString("DESCRIPTION"),
+                rs.getString("CANID_TYPE")
+        );
+        return cmi;
+    }
 }
