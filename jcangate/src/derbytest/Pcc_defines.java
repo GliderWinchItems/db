@@ -6,11 +6,9 @@
 package derbytest;
 
 import java.sql.*;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import static javax.management.remote.JMXConnectorFactory.connect;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.*;
 
 /**
  *
@@ -58,11 +56,19 @@ public class Pcc_defines {
             
             Integer totalct = 0;
             
+            // Fill ArrayList with database data
+            ArrayList<Canmsginfo> canidlist = new ArrayList<Canmsginfo>();
+            genlist_Canid(stmt, canidlist);         
             
-            // Generate #defines for READINGS_BOARD table
-            genlist_Canid(stmt);         
-            
+            // Test search
+            String sid = "05C0000C";
+            Canmsginfo cmi2 = new Canmsginfo (Long.parseLong(sid,16));
  
+            int index = Collections.binarySearch(canidlist, cmi2);
+            System.out.format("search index: %d %08X\n",index, Long.parseLong(sid,16));
+            
+            
+//         int index = Collections.binarySearch(Canmsginfo, canidlist, 0xFFFFFFCC);
         }
         catch(SQLException e) {
             //TODO Fix error handling
@@ -74,9 +80,12 @@ public class Pcc_defines {
         finally {
             if (pstmt != null) pstmt.close();
         }
+        
+        System.out.format("DONE\n");
     }
-   
-        private static void genlist_Canid(Statement stmt) throws SQLException{
+        // Fill an ArrayList with database data
+        private static void genlist_Canid(Statement stmt, ArrayList canidlist) throws SQLException{
+
 /*
 SELECT 
     CANID.*,
@@ -97,6 +106,8 @@ ORDER BY CANID.CANID_HEX;
             
             int count = 0;
             
+            //ArrayList<Canmsginfo> canidlist = new ArrayList<Canmsginfo>();
+
             while (rs.next()) {
                 /*
                 System.out.format("%-24s",rs.getString("CANID_NAME"));
@@ -105,12 +116,30 @@ ORDER BY CANID.CANID_HEX;
                 System.out.format("%s" + "\n",         rs.getString("DESCRIPTION"));
                 */
                 count += 1;
+                // Convert sql/db info into Canmsginfo
                 Canmsginfo cmi1 = new Canmsginfo ();
                 cmi1 = fillCanlist(rs);
                 System.out.format("0x%08X %3d %s\t%s %s\n",cmi1.can_hex,cmi1.pay_type_code,cmi1.can_msg_fmt,cmi1.descript_canid,
                         cmi1.descript_payload);
+                // Add Canmsginfo to ArrayList
+                canidlist.add (new Canmsginfo(cmi1));
             }
-                       System.out.format("\n/* TOTAL COUNT OF #defines = %d  */\n",count);
+            System.out.format("\n/* TOTAL COUNT = %d  */\n\n",count);
+            
+            count = 0;
+            System.out.format("cmi1 size: %d\n",canidlist.size());
+            Iterator<Canmsginfo> itr = canidlist.iterator();
+            while(itr.hasNext()) {
+                Canmsginfo x = itr.next();
+                 System.out.format("ITR: %3d 0x%08X %3d %s\t%s %s\n", count,
+                        x.can_hex,
+                        x.pay_type_code,
+                        x.can_msg_fmt,
+                        x.descript_canid,
+                        x.descript_payload);
+                 count += 1;
+            }
+            System.out.format("\n/* TOTAL COUNT = %d  */\n",count);
         }
     private static Canmsginfo fillCanlist(ResultSet rs) throws SQLException{
         Canmsginfo cmi = new Canmsginfo(
