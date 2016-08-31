@@ -28,6 +28,11 @@ public class Canmsginfo implements Comparable<Canmsginfo>, Comparator<Canmsginfo
     * ********************************************************************* */
     public Canmsginfo(){
     }
+    /* Use this for inserting a NOT FOUND "dummy". */
+    public Canmsginfo(Long id, String s){
+        this.can_hex = id;
+        this.can_name = s;
+    }
     
     public Canmsginfo(String id, int n2, String s0, String s1, String s2, String s3){
         this.can_hex       = Long.parseLong(id, 16);
