@@ -6,10 +6,6 @@
 package derbytest;
 
 import java.util.Comparator;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.*;
 
 /**
  *
@@ -22,6 +18,14 @@ public class CanDisplay implements Comparable<CanDisplay>, Comparator<CanDisplay
     public String vartext;  // Decoded values
     public String fixtext;  // Description and stuff
     public Canmsginfo cmi;  // Database stuff
+    public Canmsg2j cmsg;   // Latest CAN msg
+    
+    public int id;  // 32b word with CAN id (STM32 CAN format)
+    public int dlc; // Payload count (number of bytes in payload)
+    public int p0;  // Assembled Integer of payload bytes [0]-[3]
+    public int p1;  // Assembled Integer of payload bytes [4]-[7]
+    public long pl; // Assembled Long from payload bytes [0]-[7]
+    public byte[] pb;// Binary bytes as received and converted from ascii/hex input
     
     public CanDisplay(){
     }    
@@ -31,6 +35,11 @@ public class CanDisplay implements Comparable<CanDisplay>, Comparator<CanDisplay
     public CanDisplay(Long id, Canmsginfo c){
         this.can_hex    = id;
         this.cmi        = c;
+    }
+       public CanDisplay(Long id, Canmsginfo c, Canmsg2j m){
+        this.can_hex    = id;
+        this.cmi        = c;
+        cmsg = new Canmsg2j();
     }
     public CanDisplay(Long id, String s){
         this.can_hex    = id;
@@ -51,6 +60,14 @@ public class CanDisplay implements Comparable<CanDisplay>, Comparator<CanDisplay
     public int incCount(){
         count += 1;
         return count;
+    }
+    public void setCmsg2(Canmsg2j c){
+        id  = c.id;
+        dlc = c.dlc;
+        p0  = c.p0;
+        p1  = c.p1;
+        pb  = c.pb;
+        cmsg = c;
     }
 
     @Override

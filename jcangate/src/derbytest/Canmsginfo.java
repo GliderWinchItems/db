@@ -23,6 +23,7 @@ public class Canmsginfo implements Comparable<Canmsginfo>, Comparator<Canmsginfo
         public String can_name;         // CAN ID name (CANID)
         public String descript_canid;  // Description CAN ID (CANID)
         public String descript_payload; // Description of payload (PAYLOAD_TYPE)
+        public String canid_type;       // 
     /* *********************************************************************
     * Constructors
     * ********************************************************************* */
@@ -34,17 +35,18 @@ public class Canmsginfo implements Comparable<Canmsginfo>, Comparator<Canmsginfo
         this.can_name = s;
     }
     
-    public Canmsginfo(String id, int n2, String s0, String s1, String s2, String s3){
-        this.can_hex       = Long.parseLong(id, 16);
-        this.pay_type_code = n2;
-        this.can_msg_fmt     = s0;
-        this.can_name        = s1;
-        this.descript_canid  = s2;
-        this.descript_payload= s3;
+    public Canmsginfo(String s0, String id, String s1, String s2, String s3, int n2,  String s4){
+        this.can_name        = s0; // rs.getString("CANID_NAME"),
+        this.can_hex       = Long.parseLong(id, 16);   // rs.getString("CANID_HEX"),
+        this.canid_type      = s1; // rs.getString("CANID_TYPE")
+        this.can_msg_fmt     = s2; // rs.getString("CAN_MSG_FMT"),
+        this.descript_canid  = s3; // rs.getString("DESCRIPTION"),
+        this.pay_type_code   = n2; // rs.getInt   ("PAYLOAD_TYPE_CODE"),
+        this.descript_payload= s4; // rs.getString("DESCRIPTION")
     }
     public Canmsginfo(Canmsginfo cmi){
         this.can_hex       = cmi.can_hex;
-        this.pay_type_code = cmi.pay_type_code;
+        this.pay_type_code = cmi.pay_type_code; 
         this.can_msg_fmt     = cmi.can_msg_fmt;
         this.can_name        = cmi.can_name;
         this.descript_canid  = cmi.descript_canid;

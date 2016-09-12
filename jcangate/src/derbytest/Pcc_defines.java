@@ -65,12 +65,12 @@ public class Pcc_defines {
             genlist_Canid(stmt, canidlist);         
             
             // Test search
-            long l1 = 0xFFFFFF16;   // Remember sign extends
+            long l1 = 0xE1C00000;   // Remember sign extends
             l1 = (l1 << 32) >>> 32; // Get rid of upper bits
             Long L1 = l1;           // Needed for comparisons
             Canmsginfo cmi2 = new Canmsginfo (L1); // CAN ID w remainder nulls
             int index = Collections.binarySearch(canidlist, cmi2); // Lookup
-            System.out.format("search index: %d %08X\n",index, L1); 
+            System.out.format("########### search index: %d %08X\n",index, L1); 
 // ===================================================================================
             String ip;
             ip = "127.0.0.1";   // Default ip address
@@ -92,6 +92,7 @@ public class Pcc_defines {
                 new InputStreamReader(socket.getInputStream()));
             Canmsg2j can1; 
             can1 = new Canmsg2j();    // Received CAN message
+            DbPayload dbpay = new DbPayload();
             int ret;
             int count2 = 0;
             int count3 = 0;
@@ -109,21 +110,10 @@ public class Pcc_defines {
                     System.out.format("Input conversion error: %d\n", ret); // No show the error code
                     continue;
                     }      
-if(1 != 1){              
-              if (can1.id == 0xE1800000){ 
-        //            System.out.format("%08X\n",can1.id);
-                    Canmsginfo cmi3 = new Canmsginfo (Long.parseLong("E1800000",16));
-                    int index1 = Collections.binarySearch(canidlist, cmi3);
-                    Canmsginfo cmi4 = new Canmsginfo (canidlist.get(index1));
-                    System.out.format("idx: %3d %4d %08X %s\n",index1, count2++,
-                            cmi4.can_hex,
-                            cmi4.can_name);
-              }
-}
            // +++++++++++++++++++++++++++++++++++
-              // Convert 'int' to 'Long' (handling sign extension problem)
+              // Convert 'unsigned int' to 'Long' (handling sign extension problem)
               long ltmp = can1.id;  
-              ltmp = (ltmp << 32) >>>32;  
+              ltmp = (ltmp << 32) >>>32;  // Sign extension fix
               Long Ltmp = ltmp;
               
               /* Look up CAN ID in display table */
@@ -134,32 +124,39 @@ if(1 != 1){
                   Canmsginfo cmi5 = new Canmsginfo (Ltmp);
                   int index5 = Collections.binarySearch(canidlist, cmi5);
                   if (index5 < 0){ // When not found add a dummy to list
-                      canidlist.add ((-index5-1),new Canmsginfo(Ltmp,"NOT FOUND"));
+                      index5 = -index5-1;
+                      canidlist.add (index5,new Canmsginfo(Ltmp,"NOT LISTED"));
                   } 
                   /* Add new CAN ID with database info to display list */
                   Canmsginfo cmi6 = new Canmsginfo (canidlist.get(index5));
+//                  CanDisplay cd3 = new CanDisplay(Ltmp, cmi6, can1);
                   CanDisplay cd3 = new CanDisplay(Ltmp, cmi6);
                   candisplay.add ((-index2-1), cd3); // Add new CAN ID to list
                   index2 = Collections.binarySearch(candisplay, cd2);
                   count3 += 1;  // For test purposes
               }
-              /* Add to count */
-              cd2 = candisplay.get(index2);
-              cd2.count += 1;
-              candisplay.set(index2, cd2);
+              /* Update display data */
+              cd2 = candisplay.get(index2); // Extract it
+              cd2.count += 1;   // Update the count
+              cd2.setCmsg2(can1);  // Update the current CAN msg
+              candisplay.set(index2, cd2); // Restore it
+              
               /* Display update timing based on CAN time msg */
-              if (can1.id == 0x00200000){ // Use time msgs to time display
+              if ((can1.id == 0x00600000)||(can1.id == 0x00400000)){ // Use time msgs to time display
                   count4 += 1; // 64 per second
                   if (count4 >= 64){
                     count4 = 0; // Use to count number of entries
                     Iterator<CanDisplay> itr = candisplay.iterator(); // List list
                     while(itr.hasNext()) {
                         CanDisplay x = itr.next();
-                        System.out.format("CD: %3d 0x%08X %4d %s\t%s\n",count4++,
+                        System.out.format("CD: %3d 0x%08X %4d %s\t%2d %s\t%s\n",count4++,
                                 x.can_hex,
                                 x.count,
                                 x.cmi.can_name,
-                                x.cmi.descript_canid);
+                                x.cmi.pay_type_code,
+                                x.cmi.descript_canid,
+                                dbpay.convert(x),x
+                                );
                         x.count = 0; // Reset count for next display interval
                   }
                   tickct += 1;  // Running time tick ct
@@ -197,7 +194,7 @@ JOIN PAYLOAD_TYPE
     ON PAYLOAD_TYPE.PAYLOAD_TYPE_NAME = CANID.CAN_MSG_FMT
 ORDER BY CANID.CANID_HEX;
 */      
-       String query = "select CANID.*,PAYLOAD_TYPE.PAYLOAD_TYPE_CODE,PAYLOAD_TYPE.DESCRIPTION  FROM CANID \n "
+       String query = "select CANID.*,PAYLOAD_TYPE.PAYLOAD_TYPE_CODE,PAYLOAD_TYPE.DESCRIPTION12  FROM CANID \n "
         + "JOIN PAYLOAD_TYPE \n"
                + "ON PAYLOAD_TYPE.PAYLOAD_TYPE_NAME = CANID.CAN_MSG_FMT \n"
                + "ORDER BY CANID.CANID_HEX";
@@ -244,12 +241,13 @@ ORDER BY CANID.CANID_HEX;
         }
     private static Canmsginfo fillCanlist(ResultSet rs) throws SQLException{
         Canmsginfo cmi = new Canmsginfo(
-                rs.getString("CANID_HEX"),
-                rs.getInt   ("PAYLOAD_TYPE_CODE"),
-                rs.getString("CAN_MSG_FMT"),
                 rs.getString("CANID_NAME"),
-                rs.getString("DESCRIPTION"),
-                rs.getString("CANID_TYPE")
+                rs.getString("CANID_HEX"),
+                rs.getString("CANID_TYPE"),
+                rs.getString("CAN_MSG_FMT"),
+                rs.getString("DESCRIPTION"),    // CANID
+                rs.getInt   ("PAYLOAD_TYPE_CODE"),
+                rs.getString("DESCRIPTION12")   // PAYLOAD_TYPE
         );
         return cmi;
     }

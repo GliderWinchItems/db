@@ -6,6 +6,7 @@
 
 package derbytest;
 
+import java.util.Comparator;
 import javax.xml.bind.DatatypeConverter;
 
 /**
@@ -42,6 +43,9 @@ public class Canmsg2j {
     }
     public Canmsg2j(int iseq, int iid, int idlc){
         seq = iseq; id = iid; dlc = idlc; pb = new byte[15]; ps = new short[4];
+    }
+    public Canmsg2j(byte[] b){
+        pb = new byte[15];
     }
     /* *************************************************************************
     Compute CAN message checksum on binary array
@@ -112,6 +116,10 @@ public class Canmsg2j {
    /* Combine payload bytes [0]-[3] to an Integer */
    public void in_1int(){
         p0 = (((((((pb[9] & 0xff) << 8) | (pb[8] & 0xff)) << 8) | (pb[7] & 0xff)) << 8) | (pb[6] & 0xff));
+   }
+     /* Combine payload bytes [n]-[n+3] to an Integer */
+   public void in_1int_n(int n){
+        p0 = (((((((pb[9+n] & 0xff) << 8) | (pb[8+n] & 0xff)) << 8) | (pb[7+n] & 0xff)) << 8) | (pb[6+n] & 0xff));
    }
    /* Combine payload bytes [0]-[3] and [4]-[7] to two Integers */
    public void in_2int(){
