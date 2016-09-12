@@ -46,7 +46,7 @@ public class Pcc_values_table {
         + "PARAM_VAL.PARAM_VAL,"
         + "NUMBER_TYPE.TYPE_CODE,"
         + "PARAM_LIST.PARAM_NAME, " 
-        + "PARAM_VAL.DESCRIPTION \n"
+        + "PARAM_VAL.DESCRIPTION11 \n"
         + "FROM PARAM_LIST \n"
             + "JOIN PARAM_VAL \n"
                 + "ON PARAM_LIST.PARAM_NAME = PARAM_VAL.PARAM_NAME\n"
@@ -175,7 +175,7 @@ tmpsave = tmp;
                 }
                 System.out.format("%-18s ",rs.getString("PARAM_VAL"));
                 System.out.format(" %2d ",code);
-                System.out.format(" %-80s*/\n",rs.getString("DESCRIPTION"));
+                System.out.format(" %-80s*/\n",rs.getString("DESCRIPTION11"));
             }
             System.out.format("};\n#endif\n");
 // =========================================================================            
@@ -204,7 +204,7 @@ tmpsave = tmp;
         + "ORDER BY FUNCTIONS.CAN_UNIT_NAME";
           
             
-                        rs = stmt.executeQuery(query);
+            rs = stmt.executeQuery(query);
             count = 0;
 
 // ========= Make counts of sizes of command CAN ID tables ===============================
@@ -222,7 +222,7 @@ tmpsave = tmp;
                         flag = 1;
                     }else{
                         System.out.format("\n#define %s_CMDID_TABLE_SIZE %d",old,count1);
-                        System.out.format("\t// %s\n",rs.getString("DESCRIPTION"));
+                        System.out.format("\t// %s\n",rs.getString("DESCRIPTION7"));
                         count1 = 0;
                     }              
                     old = tmp;
@@ -248,8 +248,7 @@ tmpsave = tmp;
                         System.out.format("};\n#endif\n"); // End for this unit
                         count = 0;
                      }
-                    String yid = "";    // Get unit CAN ID
-                    yid = rs.getString("CANID_HEX");
+                    String yid = rs.getString("CANID_HEX");
                     System.out.format("\n// =====================================================================\n");
                     System.out.format("#ifdef %s\t// a #define is used to select the following\n",tmp);
                     System.out.format("const struct FUNC_CANID func_canid[] = {\n");
@@ -260,13 +259,12 @@ tmpsave = tmp;
                 }    
                 String val = rs.getString("CANID_CMD_NAME");
                 Integer x = 0; 
-                String y = "";
-                y = getCANID(stmt2, val);
+                String y = getCANID(stmt2, val);
                 count += 1;
                 System.out.format("{%4d,  0x%s }, /* %3d ",rs.getInt("FUNCTION_TYPE_CODE"),y, count);
                 System.out.format("%-18s ",rs.getString("CAN_UNIT_NAME"));
                 System.out.format("  %s\t", val);
-                System.out.format(" %-30s*/\n",rs.getString("DESCRIPTION"));
+                System.out.format(" %-30s*/\n",rs.getString("DESCRIPTION7"));
             }
             System.out.format("};\n#endif\n");        
 
