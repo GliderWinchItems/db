@@ -62,8 +62,8 @@ public class Pcc_defines {
             
             // Fill ArrayList with database data
             ArrayList<Canmsginfo> canidlist = new ArrayList<Canmsginfo>();
-            genlist_Canid(stmt, canidlist);         
-            
+            genlist_Canid(stmt, canidlist); 
+                       
             // Test search
             long l1 = 0xE1C00000;   // Remember sign extends
             l1 = (l1 << 32) >>> 32; // Get rid of upper bits
@@ -183,7 +183,6 @@ public class Pcc_defines {
     }
         // Fill an ArrayList with database data
         private static void genlist_Canid(Statement stmt, ArrayList canidlist) throws SQLException{
-
 /*
 SELECT 
     CANID.*,
