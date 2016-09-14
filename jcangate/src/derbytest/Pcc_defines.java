@@ -64,7 +64,7 @@ public class Pcc_defines {
             ArrayList<Canmsginfo> canidlist = new ArrayList<Canmsginfo>();
             genlist_Canid(stmt, canidlist); 
                        
-            // Test search
+            // Test/debugging search
             long l1 = 0xE1C00000;   // Remember sign extends
             l1 = (l1 << 32) >>> 32; // Get rid of upper bits
             Long L1 = l1;           // Needed for comparisons
@@ -98,6 +98,7 @@ public class Pcc_defines {
             int count3 = 0;
             int count4 = 0;
             int tickct = 0;
+            int syncidsw = 0;
             
             // Build array with CAN ids encountered
             ArrayList<CanDisplay> candisplay = new ArrayList<CanDisplay>();
@@ -141,8 +142,16 @@ public class Pcc_defines {
               cd2.setCmsg2(can1);  // Update the current CAN msg
               candisplay.set(index2, cd2); // Restore it
               
+              if (can1.id == 0x00600000) syncidsw |= 0x1;
+              if (can1.id == 0x00400000) syncidsw |= 0x2;
+              
               /* Display update timing based on CAN time msg */
-              if ((can1.id == 0x00600000)||(can1.id == 0x00400000)){ // Use time msgs to time display
+              if (((can1.id == 0x00600000) && (syncidsw == 1)) ||
+                  ((can1.id == 0x00400000) && (syncidsw == 2)) ||
+                  ((can1.id == 0x00400000) && (syncidsw == 3))
+                      )
+              { // Use time msgs to time display
+                  
                   count4 += 1; // 64 per second
                   if (count4 >= 64){
                     count4 = 0; // Use to count number of entries
