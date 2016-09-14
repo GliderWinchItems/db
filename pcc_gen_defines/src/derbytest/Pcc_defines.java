@@ -122,7 +122,20 @@ public class Pcc_defines {
             ResultSet rs;
             rs = stmt.executeQuery(query);
             Integer count = 0;
-            while (rs.next()) {count += 1;}
+            while (rs.next()) {
+                long k = Long.parseLong(rs.getString("CANID_HEX"), 16); 
+                if (((k & 0x001fff8)!= 0) && ((k & 0x4) == 0) ){
+                    System.out.format("ERROR Illegal 11b CAN ID ct: %d %s %08X %s\n",count,
+                        rs.getString("CANID_NAME"),
+                        k,rs.getString("DESCRIPTION") );
+                }
+                if ((k & 0x1) != 0){
+                    System.out.format("ERROR Illegal bit0 CAN ID ct: %d %s %08X %s\n",count,
+                        rs.getString("CANID_NAME"),
+                        k,rs.getString("DESCRIPTION") );
+                }
+                count += 1;
+            }
             System.out.format("\n#define CANID_COUNT %d\n",count);
             
             rs = stmt.executeQuery(query);
@@ -150,7 +163,7 @@ public class Pcc_defines {
                  System.out.format("#define  " + "%-24s",rs.getString("TYPE_NAME"));
                  System.out.format("%-10s",rs.getString("TYPE_CODE"));
                  System.out.format("// " + "%-12s",rs.getString("TYPE_CT"));
-                 System.out.format("%s" + "\n",rs.getString("DESCRIPTION"));
+                 System.out.format("%s" + "\n",rs.getString("DESCRIPTION9"));
              }
              return count;
          }
@@ -168,7 +181,7 @@ public class Pcc_defines {
              while (rs.next()) {
                  System.out.format("#define  " + "%-24s",rs.getString("CMD_CODE_NAME"));
                  System.out.format("%-10s",rs.getString("CMD_CODE_NUMBER"));
-                 System.out.format("// " + "%-12s\n",rs.getString("DESCRIPTION"));
+                 System.out.format("// " + "%-12s\n",rs.getString("DESCRIPTION4"));
              }
              return count;
          }
@@ -186,7 +199,7 @@ public class Pcc_defines {
             while (rs.next()) {
                 System.out.format("#define  " + "%-24s",rs.getString("PAYLOAD_TYPE_NAME"));
                 System.out.format("%-10s",             rs.getString("PAYLOAD_TYPE_CODE"));
-                System.out.format("// " + "%-48s\n",     rs.getString("DESCRIPTION"));
+                System.out.format("// " + "%-48s\n",     rs.getString("DESCRIPTION12"));
             }
             return count;
         }
@@ -219,10 +232,10 @@ public class Pcc_defines {
                 old = tmp;
                 System.out.format("#define  " + "%-24s\t",rs.getString("PARAM_NAME"));
                 System.out.format("%-10s",                rs.getString("PARAM_CODE"));
-                System.out.format("// " + "%-48s\n",      rs.getString("DESCRIPTION"));
+                System.out.format("// " + "%-48s\n",      rs.getString("DESCRIPTION10"));
                 count1 += 1;
             }
-            System.out.format("\n#define PARAM_LIST_CT_%s\t%d\t// Count of same FUNCTIONSTYPE in preceding list\n\n",old, count1);            
+            System.out.format("\n#define PARAM_LIST_CT_%s\t%d\t// Count of same FUNCTION_TYPE in preceding list\n\n",old, count1);            
             return count;
         }    
        
@@ -240,7 +253,7 @@ public class Pcc_defines {
             while (rs.next()) {
                 System.out.format("#define  " + "%-24s\t",rs.getString("READINGS_NAME"));
                 System.out.format("%-10s",                rs.getString("READINGS_CODE"));
-                System.out.format("// " + "%-48s\n",      rs.getString("DESCRIPTION"));
+                System.out.format("// " + "%-48s\n",      rs.getString("DESCRIPTION16"));
             }
             return count;
         }   
@@ -259,7 +272,7 @@ public class Pcc_defines {
                 System.out.format("#define  " + "%-24s\t",rs.getString("FUNC_BIT_PARAM_NAME"));
                 System.out.format("%-10s",                rs.getString("FUNC_BIT_PARAM_VAL"));
                 System.out.format("// " + "%-20s",        rs.getString("FUNCTION_TYPE"));
-                System.out.format("%-48s\n",              rs.getString("DESCRIPTION"));
+                System.out.format("%-48s\n",              rs.getString("DESCRIPTION5"));
             }
             return count;
         } 
@@ -278,7 +291,7 @@ public class Pcc_defines {
                 System.out.format("#define  " + "%-24s\t",rs.getString("CAN_UNIT_NAME"));
                 System.out.format("%-10s",                rs.getString("CAN_UNIT_CODE"));
                 System.out.format("// " + "%-20s",        rs.getString("CANID_NAME"));
-                System.out.format("%-48s\n",              rs.getString("DESCRIPTION"));
+                System.out.format("%-48s\n",              rs.getString("DESCRIPTION3"));
             }
             return count;
         }    
@@ -296,7 +309,7 @@ public class Pcc_defines {
             while (rs.next()) {
                 System.out.format("#define  FUNCTION_TYPE_" + "%-24s\t",rs.getString("FUNCTION_TYPE"));
                 System.out.format("%-10s",                rs.getInt("FUNCTION_TYPE_CODE"));
-                System.out.format("// " + "%-48s\n",              rs.getString("DESCRIPTION"));
+                System.out.format("// " + "%-48s\n",              rs.getString("DESCRIPTION8"));
             }
             return count;
         }  
@@ -314,7 +327,7 @@ public class Pcc_defines {
             while (rs.next()) {
                 System.out.format("#define  " + "%-24s\t",rs.getString("READINGS_BOARDNAME"));
                 System.out.format("%-10s",                rs.getInt("READINGS_BOARDCODE"));
-                System.out.format("// " + "%-48s\n",              rs.getString("DESCRIPTION"));
+                System.out.format("// " + "%-48s\n",              rs.getString("DESCRIPTION15"));
             }
             return count;
         }           
