@@ -13,12 +13,16 @@ import java.util.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import static java.lang.System.exit;
 import java.net.Socket;
 /**
  *
  * @author deh
  */
 public class Pcc_defines {
+        private static Long CANID_HB_TIMESYNC;      //
+        private static Long CANID_HB_TIMESYNC_2;    //
+    
 
         private static String driverName = "org.apache.derby.jdbc.EmbeddedDriver";
         private static String clientDriverName = "org.apache.derby.jdbc.ClientDriver";
@@ -45,7 +49,7 @@ public class Pcc_defines {
             throw e;
         }
     
-        //Try to connect to the specified database
+// ==== Try to connect to the specified database ===============================
         try{
             
             System.out.println("List of CANIDs sorted by HEX ");
@@ -60,18 +64,44 @@ public class Pcc_defines {
             
             Integer totalct = 0;
             
-            // Fill ArrayList with database data
+// ===== Fill ArrayList with database data =====================================
             ArrayList<Canmsginfo> canidlist = new ArrayList<Canmsginfo>();
             genlist_Canid(stmt, canidlist); 
-                       
-            // Test/debugging search
+            
+// ===== Look up value of CANID names used =====================================
+            int xcount = 0;
+            System.out.format("######### candisplay.size: %d\n",canidlist.size());
+            Iterator<Canmsginfo> itr2 = canidlist.iterator();
+            while(itr2.hasNext()) {
+                Canmsginfo x = itr2.next();
+                if ("CANID_HB_TIMESYNC".equals(x.can_name)){
+                    CANID_HB_TIMESYNC = x.can_hex;
+                    xcount += 1;
+                }
+                if ("CANID_HB_TIMESYNC_2".equals(x.can_name)){
+                    CANID_HB_TIMESYNC_2= x.can_hex;
+                    xcount += 1;
+                }
+            }
+            if (xcount != 2) {
+                System.out.format("ERR Loading timesync can id: xcount = %d\n",xcount);
+                exit(-1);
+            }
+            System.out.format("##### CANID_HB_TIMESYNC   %08X\n##### CANID_HB_TIMESYNC_2 %08X\n", 
+                    CANID_HB_TIMESYNC,CANID_HB_TIMESYNC_2);
+// ===== Experimenting with constants
+            PccConst pccconst = new PccConst();
+            pccconst.fillList(stmt);
+            
+// ===== Test/debugging search =================================================
             long l1 = 0xE1C00000;   // Remember sign extends
             l1 = (l1 << 32) >>> 32; // Get rid of upper bits
             Long L1 = l1;           // Needed for comparisons
             Canmsginfo cmi2 = new Canmsginfo (L1); // CAN ID w remainder nulls
             int index = Collections.binarySearch(canidlist, cmi2); // Lookup
-            System.out.format("########### search index: %d %08X\n",index, L1); 
-// ===================================================================================
+            System.out.format("########### search test binarySearch: index: %d %08X\n",index, L1); 
+            
+// ===== Setup connection to socket ============================================
             String ip;
             ip = "127.0.0.1";   // Default ip address
             //String ip = new String("10.1.1.80");
@@ -100,9 +130,10 @@ public class Pcc_defines {
             int tickct = 0;
             int syncidsw = 0;
             
-            // Build array with CAN ids encountered
+// ======= Build array with CAN ids encountered ================================
             ArrayList<CanDisplay> candisplay = new ArrayList<CanDisplay>();
-   // ======== Endless loop ====================================================
+            
+// ======== Endless loop ====================================================
             while (true) {
               String msg = in.readLine();         // Get a line from socket
      //         System.out.format("%s\n",msg);
@@ -111,24 +142,23 @@ public class Pcc_defines {
                     System.out.format("Input conversion error: %d\n", ret); // No show the error code
                     continue;
                     }      
-           // +++++++++++++++++++++++++++++++++++
               // Convert 'unsigned int' to 'Long' (handling sign extension problem)
               long ltmp = can1.id;  
               ltmp = (ltmp << 32) >>>32;  // Sign extension fix
               Long Ltmp = ltmp;
               
-              /* Look up CAN ID in display table */
+              // Look up CAN ID in display table
               CanDisplay cd2 = new CanDisplay(Ltmp);
               int index2 = Collections.binarySearch(candisplay, cd2);
               if (index2 < 0){  // Check if CAN ID was found
-                   /* Look up database info for this new CAN ID */
+                   // Look up database info for this new CAN ID
                   Canmsginfo cmi5 = new Canmsginfo (Ltmp);
                   int index5 = Collections.binarySearch(canidlist, cmi5);
                   if (index5 < 0){ // When not found add a dummy to list
                       index5 = -index5-1;
                       canidlist.add (index5,new Canmsginfo(Ltmp,"NOT LISTED"));
                   } 
-                  /* Add new CAN ID with database info to display list */
+                  // Add new CAN ID with database info to display list
                   Canmsginfo cmi6 = new Canmsginfo (canidlist.get(index5));
 //                  CanDisplay cd3 = new CanDisplay(Ltmp, cmi6, can1);
                   CanDisplay cd3 = new CanDisplay(Ltmp, cmi6);
@@ -136,19 +166,20 @@ public class Pcc_defines {
                   index2 = Collections.binarySearch(candisplay, cd2);
                   count3 += 1;  // For test purposes
               }
-              /* Update display data */
+              // Update display data
               cd2 = candisplay.get(index2); // Extract it
               cd2.count += 1;   // Update the count
               cd2.setCmsg2(can1);  // Update the current CAN msg
               candisplay.set(index2, cd2); // Restore it
               
-              if (can1.id == 0x00600000) syncidsw |= 0x1;
-              if (can1.id == 0x00400000) syncidsw |= 0x2;
+              // Use one of the following time msgs for timing the display interval
+              if (can1.id == CANID_HB_TIMESYNC_2) syncidsw |= 0x1;
+              if (can1.id == CANID_HB_TIMESYNC) syncidsw |= 0x2;
               
               /* Display update timing based on CAN time msg */
-              if (((can1.id == 0x00600000) && (syncidsw == 1)) ||
-                  ((can1.id == 0x00400000) && (syncidsw == 2)) ||
-                  ((can1.id == 0x00400000) && (syncidsw == 3))
+              if (((can1.id == CANID_HB_TIMESYNC_2) && (syncidsw == 1)) ||
+                  ((can1.id == CANID_HB_TIMESYNC) && (syncidsw == 2)) ||
+                  ((can1.id == CANID_HB_TIMESYNC) && (syncidsw == 3))
                       )
               { // Use time msgs to time display
                   
@@ -164,7 +195,7 @@ public class Pcc_defines {
                                 x.cmi.can_name,
                                 x.cmi.pay_type_code,
                                 x.cmi.descript_canid,
-                                dbpay.convert(x),x
+                                dbpay.convert(x),x /* Convert payload for display */
                                 );
                         x.count = 0; // Reset count for next display interval
                   }
@@ -192,7 +223,7 @@ public class Pcc_defines {
     }
         // Fill an ArrayList with database data
         private static void genlist_Canid(Statement stmt, ArrayList canidlist) throws SQLException{
-/*
+/* The following can be pasted in the Service tab to manually run the query (for testing and amazement)
 SELECT 
     CANID.*,
     PAYLOAD_TYPE.PAYLOAD_TYPE_CODE,
@@ -208,19 +239,11 @@ ORDER BY CANID.CANID_HEX;
                + "ORDER BY CANID.CANID_HEX";
         
             ResultSet rs;
-            rs = stmt.executeQuery(query);
-            
+            rs = stmt.executeQuery(query);            
             int count = 0;
             
-            //ArrayList<Canmsginfo> canidlist = new ArrayList<Canmsginfo>();
-
+            // Extract result of database query (sorted order) and store in arraylist
             while (rs.next()) {
-                /*
-                System.out.format("%-24s",rs.getString("CANID_NAME"));
-                System.out.format(" 0x%-10s",             rs.getString("CANID_HEX"));
-                System.out.format("// " + "%-15s: ",     rs.getString("CANID_TYPE"));
-                System.out.format("%s" + "\n",         rs.getString("DESCRIPTION"));
-                */
                 count += 1;
                 // Convert sql/db info into Canmsginfo
                 Canmsginfo cmi1 = new Canmsginfo ();
@@ -231,7 +254,7 @@ ORDER BY CANID.CANID_HEX;
                 canidlist.add (new Canmsginfo(cmi1));
             }
             System.out.format("\n/* TOTAL COUNT = %d  */\n\n",count);
-            
+            // List array and check the count (debugging)
             count = 0;
             System.out.format("cmi1 size: %d\n",canidlist.size());
             Iterator<Canmsginfo> itr = canidlist.iterator();

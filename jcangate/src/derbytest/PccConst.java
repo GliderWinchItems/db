@@ -15,26 +15,28 @@ import java.util.Iterator;
  * @author deh
  */
 public class PccConst {
+    ArrayList<StringIntPairs> paylist = new ArrayList<StringIntPairs>();
     
     public PccConst(){
         
     }
-    public static void fillList(Statement stmt) throws SQLException{
+    public void fillList(Statement stmt) throws SQLException{
         String query = "select PAYLOAD_TYPE.* FROM PAYLOAD_TYPE";
             ResultSet rs;
             rs = stmt.executeQuery(query);
             
-            int count = 0;
-            
-            //ArrayList<Canmsginfo> canidlist = new ArrayList<Canmsginfo>();
-
+        int count = 0;
+        System.out.format("seq code name    description12\n");
         while (rs.next()) {
-            count += 1;
-            StringIntPairs sip = new StringIntPairs(
-                rs.getString ("PAYLOAD_TYPE_NAME"),
-                rs.getInt   ("PAYLOAD_TYPE_CODE"),
-                rs.getString("DESCRIPTION12")   // PAYLOAD_TYPE
-            );  
+                            // Convert sql/db info into Canmsginfo
+                StringIntPairs sip = new StringIntPairs(
+                    rs.getString ("PAYLOAD_TYPE_NAME"),
+                    rs.getInt    ("PAYLOAD_TYPE_CODE"),
+                    rs.getString ("DESCRIPTION12")
+                );
+                System.out.format("%2d %3d\t%s\t%s\n",count,sip.n,sip.s,sip.description);
+                paylist.add(sip);
+                count += 1;
         }
     }
 }

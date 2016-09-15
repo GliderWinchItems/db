@@ -5,6 +5,9 @@
  */
 package derbytest;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.SimpleDateFormat;
 
 /**
@@ -17,6 +20,7 @@ public class DbPayload {
     private final int xFF        = 11; //[1]-[4]: Full-Float, first   byte  skipped
     private final int LAT_LON_HT = 20; //[0]:[1]:[2]-[5]: Fix type, bits fields, lat/lon/ht
     private final int U8_FF      = 21; //[0]:[1]-[5]: uint8_t, Full Float
+    private final int U8         = 23; //[0]: uint8_t');
     private final int UNIXTIME   = 24; //[0]: U8_U32 with U8 bit field stuff
     private final int UNDEF      =255; //Undefined
     
@@ -90,7 +94,16 @@ public class DbPayload {
                     s += String.format("Ht %6.1f ", f/10);
                 }
                 break;
-
+                
+            case U8: // [0]: uint8_t
+                if (cd.dlc != 1){
+                         s  += String.format("ERR U8: dlc not eq 1 %d: ",cd.dlc);
+                         break;
+                }  
+                s  += String.format("%02X ",cd.pb[6] );
+                break;
+                
+                
             case UNIXTIME: // Unix time U8_U32
                 cmsg.in_1int_n(1);  // Convert bytes to int
                 java.util.Date date= new java.util.Date(); // Get current date/time
