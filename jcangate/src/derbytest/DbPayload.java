@@ -15,17 +15,11 @@ import java.text.SimpleDateFormat;
  * @author deh
  */
 public class DbPayload {
-    private final int NONE       =  0; // No payload bytes
-    private final int U8_U32     =  5; //[0]: uint8_t; [1]-[4]: uint32_t
-    private final int xFF        = 11; //[1]-[4]: Full-Float, first   byte  skipped
-    private final int LAT_LON_HT = 20; //[0]:[1]:[2]-[5]: Fix type, bits fields, lat/lon/ht
-    private final int U8_FF      = 21; //[0]:[1]-[5]: uint8_t, Full Float
-    private final int U8         = 23; //[0]: uint8_t');
-    private final int UNIXTIME   = 24; //[0]: U8_U32 with U8 bit field stuff
-    private final int UNDEF      =255; //Undefined
     
+    PccFinal pccfinal;  // PAYLOAD_TYPE name versus code
     
     public DbPayload(){
+        this.pccfinal = new PccFinal();
     }
     
     public String convert(CanDisplay cd){
@@ -35,11 +29,11 @@ public class DbPayload {
 
         int ptc = cd.cmi.pay_type_code; // Numeric payload type 
         switch (ptc){
-            case NONE:
+            case PccFinal.NONE:
                 s  += String.format("dlc:%02X: ",cd.dlc);
                 s  += "No payload bytes";
                 break;
-            case U8_U32: // U8_U32:
+            case PccFinal.U8_U32: // U8_U32:
                 if (cd.dlc != 5){
                          s  += String.format("ERR U8_U32: dlc not eq 5 %d: ",cd.dlc);
                          break;
@@ -52,7 +46,7 @@ public class DbPayload {
                 s += String.format("%8d",cmsg.p0);
                 break;
                 
-            case LAT_LON_HT:
+            case PccFinal.LAT_LON_HT:
                 if (cd.dlc != 6){
                     s  += String.format("ERR LAT_LON_HT: dlc not eq 6 %d: ",cd.dlc);
                     break;
@@ -95,7 +89,7 @@ public class DbPayload {
                 }
                 break;
                 
-            case U8: // [0]: uint8_t
+            case PccFinal.U8: // [0]: uint8_t
                 if (cd.dlc != 1){
                          s  += String.format("ERR U8: dlc not eq 1 %d: ",cd.dlc);
                          break;
@@ -104,14 +98,14 @@ public class DbPayload {
                 break;
                 
                 
-            case UNIXTIME: // Unix time U8_U32
+            case PccFinal.UNIXTIME: // Unix time U8_U32
                 cmsg.in_1int_n(1);  // Convert bytes to int
                 java.util.Date date= new java.util.Date(); // Get current date/time
                 SimpleDateFormat ss = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
                 s += ss.format(date); // Add date time to display string
                 break;
                 
-            case U8_FF:
+            case PccFinal.U8_FF:
                 if (cd.dlc != 5){
                          s  += String.format("ERR U8_FF: dlc not eq 5 %d: ",cd.dlc);
                          break;
@@ -122,7 +116,7 @@ public class DbPayload {
                 double f = Float.intBitsToFloat(cmsg.p0); // Convert int bits
                 s += String.format("%12.6f ", f);
                 break;
-            case UNDEF:
+            case PccFinal.UNDEF:
                 s += String.format("Payload UNDEF ");
                 s += String.format("dlc:%02X: ",cd.dlc);
                 for (int i = 6 ; i < cd.dlc+6; i++){

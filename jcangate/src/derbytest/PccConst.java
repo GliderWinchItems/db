@@ -21,7 +21,7 @@ public class PccConst {
         
     }
     public void fillList(Statement stmt) throws SQLException{
-        String query = "select PAYLOAD_TYPE.* FROM PAYLOAD_TYPE";
+        String query = "select PAYLOAD_TYPE.* FROM PAYLOAD_TYPE ORDER BY PAYLOAD_TYPE_CODE";
             ResultSet rs;
             rs = stmt.executeQuery(query);
             
