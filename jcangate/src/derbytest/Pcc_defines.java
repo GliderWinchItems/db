@@ -129,9 +129,14 @@ public class Pcc_defines {
             int count4 = 0;
             int tickct = 0;
             int syncidsw = 0;
+            int sw = 0;
+int flag_prev = 0;   
+int tmp;
             
 // ======= Build array with CAN ids encountered ================================
             ArrayList<CanDisplay> candisplay = new ArrayList<CanDisplay>();
+       
+            TimerTick tick = new TimerTick(3000, 1000);
             
 // ======== Endless loop ====================================================
             while (true) {
@@ -141,7 +146,10 @@ public class Pcc_defines {
               if (ret != 0){ // Did the conversion pass all the checks?
                     System.out.format("Input conversion error: %d\n", ret); // No show the error code
                     continue;
-                    }      
+                    }    
+              // Msg count in timer
+              tick.tickinc();
+              
               // Convert 'unsigned int' to 'Long' (handling sign extension problem)
               long ltmp = can1.id;  
               ltmp = (ltmp << 32) >>>32;  // Sign extension fix
@@ -172,20 +180,37 @@ public class Pcc_defines {
               cd2.setCmsg2(can1);  // Update the current CAN msg
               candisplay.set(index2, cd2); // Restore it
               
+// ========= Determine what to use for timing the interval =====================              
               // Use one of the following time msgs for timing the display interval
               if (can1.id == CANID_HB_TIMESYNC_2) syncidsw |= 0x1;
               if (can1.id == CANID_HB_TIMESYNC) syncidsw |= 0x2;
-              
+
+              tmp = tick.flag;              
+              if (tmp != flag_prev){ // New timer tick?
+                    flag_prev = tmp;    
+                    if( syncidsw == 0){ // Neither sync msg found?
+                        sw = 2;     // Do display
+                    }
+              }
+                  
               /* Display update timing based on CAN time msg */
               if (((can1.id == CANID_HB_TIMESYNC_2) && (syncidsw == 1)) ||
-                  ((can1.id == CANID_HB_TIMESYNC) && (syncidsw == 2)) ||
-                  ((can1.id == CANID_HB_TIMESYNC) && (syncidsw == 3))
-                      )
+                  ((can1.id == CANID_HB_TIMESYNC  ) && (syncidsw >= 2)) ){
+                count4 += 1; // THESE HB are 64 per second
+                if (count4 >= 64){ // One second tick?
+                    count4 = 0;
+                    sw = 1;   // Do display
+                    syncidsw = 0; // Reset for next interval
+                }
+              }
+                
+// ======== Display CAN IDs and counts during interval =========================                
+              if (sw != 0)
               { // Use time msgs to time display
-                  
-                  count4 += 1; // 64 per second
-                  if (count4 >= 64){
-                    count4 = 0; // Use to count number of entries
+                    sw = 0;
+                    if (sw == 2) System.out.format("%d TIMER TIC\n",sw);
+                    else         System.out.format("%d CANID HB\n", sw);
+
                     Iterator<CanDisplay> itr = candisplay.iterator(); // List list
                     while(itr.hasNext()) {
                         CanDisplay x = itr.next();
@@ -203,7 +228,7 @@ public class Pcc_defines {
                   System.out.format("SECS: %5d NUMBER IN LISTs: %d  %d\n",
                           tickct,count4, count3);
                   count4 = 0; // Timing count reset
-                }
+//                }
               }
             }          
 // =============================================================================
