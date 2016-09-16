@@ -127,9 +127,13 @@ public class Pcc_defines {
             int count2 = 0;
             int count3 = 0;
             int count4 = 0;
+            int count5 = 0; // CAN ID ct for interval timing
             int tickct = 0;
-            int syncidsw = 0;
-            int sw = 0;
+            int syncid1 = 0;  // Count msgs CAN ID sync1
+            int syncid2 = 0;  // Count msgs CAN ID sync2
+            int syncstate = 0;// switch to select interval time
+            int ticksw = 0; 
+            int sw = 0;       // Pass/bypass inteval display
 int flag_prev = 0;   
 int tmp;
             
@@ -182,34 +186,63 @@ int tmp;
               
 // ========= Determine what to use for timing the interval =====================              
               // Use one of the following time msgs for timing the display interval
-              if (can1.id == CANID_HB_TIMESYNC_2) syncidsw |= 0x1;
-              if (can1.id == CANID_HB_TIMESYNC) syncidsw |= 0x2;
+              if (can1.id == CANID_HB_TIMESYNC_2) syncid1 += 1;
+              if (can1.id == CANID_HB_TIMESYNC  ) syncid2 += 1;
 
+              /* Every two seconds check counts of CAN sync msgs and if neither
+                 have a reasonable count, then use the timer tick. */
               tmp = tick.flag;              
               if (tmp != flag_prev){ // New timer tick?
                     flag_prev = tmp;    
-                    if( syncidsw == 0){ // Neither sync msg found?
-                        sw = 2;     // Do display
+                    if ((tmp & 1) == 0){
+                        if (syncid1 < 10){
+                            if (syncid2 > 10){
+                                syncstate = 2;// Use 1st CAN sync msg
+                            }else{
+                                syncstate = 0;// Use timer ticks
+                            }
+                        }else{
+                            syncstate = 1; // Use 2nd CAN sync msg
+                        }                        
+                        syncid1 = 0; syncid2 = 0;
                     }
+                    ticksw = 1; // Every second tick 
               }
-                  
-              /* Display update timing based on CAN time msg */
-              if (((can1.id == CANID_HB_TIMESYNC_2) && (syncidsw == 1)) ||
-                  ((can1.id == CANID_HB_TIMESYNC  ) && (syncidsw >= 2)) ){
-                count4 += 1; // THESE HB are 64 per second
-                if (count4 >= 64){ // One second tick?
-                    count4 = 0;
-                    sw = 1;   // Do display
-                    syncidsw = 0; // Reset for next interval
-                }
+              
+              switch(syncstate)
+              {
+              case 0: // Using timer ticks
+                  if (ticksw != 0){ // Timer tick
+                      ticksw = 0; sw = 1;
+                  }
+                  break;
+              case 1: // Using CAN (logger_2?)
+                  if ((can1.id == CANID_HB_TIMESYNC_2)){
+                      count5 += 1; // 64 of these per second
+                      if (count5 >= 64){
+                          count5 = 0; sw = 2;
+                      }
+                  }
+                  break;
+             case 2: // Using CAN msg (logger_1?)
+                 if ((can1.id == CANID_HB_TIMESYNC)){
+                      count5 += 1;
+                      if (count5 >= 64){
+                          count5 = 0; sw = 3;
+                      }
+                  }
+                  break;                 
               }
-                
+              
+ 
 // ======== Display CAN IDs and counts during interval =========================                
               if (sw != 0)
               { // Use time msgs to time display
+                    System.out.format("TIMED INTERVAL: ");
+                    if (sw == 3) System.out.format("CANID_HB_TIMESYNC %08X\n",CANID_HB_TIMESYNC);
+                    if (sw == 2) System.out.format("CANID_HB_TIMESYNC_2 %08X\n",CANID_HB_TIMESYNC_2);
+                    if (sw == 1) System.out.format("TIMER TICKS\n");
                     sw = 0;
-                    if (sw == 2) System.out.format("%d TIMER TIC\n",sw);
-                    else         System.out.format("%d CANID HB\n", sw);
 
                     Iterator<CanDisplay> itr = candisplay.iterator(); // List list
                     while(itr.hasNext()) {
