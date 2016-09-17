@@ -65,7 +65,7 @@ public class Pcc_defines {
             Integer totalct = 0;
             
 // ===== Fill ArrayList with database data =====================================
-            ArrayList<Canmsginfo> canidlist = new ArrayList<Canmsginfo>();
+            ArrayList<Canmsginfo> canidlist = new ArrayList<>();
             genlist_Canid(stmt, canidlist); 
             
 // ===== Look up value of CANID names used =====================================
@@ -105,7 +105,7 @@ public class Pcc_defines {
             String ip;
             ip = "127.0.0.1";   // Default ip address
             //String ip = new String("10.1.1.80");
-            int port = new Integer (32123); // Default port
+            int port = 32123; // Default port
         
             /* Deal with the arguments on the command line */
             if (args.length > 2){
@@ -138,9 +138,9 @@ int flag_prev = 0;
 int tmp;
             
 // ======= Build array with CAN ids encountered ================================
-            ArrayList<CanDisplay> candisplay = new ArrayList<CanDisplay>();
+            ArrayList<CanDisplay> candisplay = new ArrayList<>();
        
-            TimerTick tick = new TimerTick(3000, 1000);
+            TimerTick tick = new TimerTick(1000, 1000);
             
 // ======== Endless loop ====================================================
             while (true) {
@@ -267,8 +267,6 @@ int tmp;
 // =============================================================================
         }
         catch(SQLException e) {
-            //TODO Fix error handling
-            e.printStackTrace();
             throw e;
  
         }
