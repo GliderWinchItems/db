@@ -6,6 +6,7 @@
 
 package jcanpoll;
 
+import com.sun.xml.internal.ws.util.StringUtils;
 import java.util.Comparator;
 import javax.xml.bind.DatatypeConverter;
 
@@ -171,11 +172,16 @@ public class Canmsg2j {
   
        pb[(msglength)] = checksum(pb,msglength); // Place checksum in array
       
+       
        /* Convert binary array to ascii/hex */
        StringBuilder x = new StringBuilder(DatatypeConverter.printHexBinary(pb));
+       msglength = (msglength + 1) * 2;
+       x.setLength(msglength);
        x.append("\n"); // Line terminator
-       
-       return x.toString();
+       String s = x.toString();
+System.out.format("len s: %d\n",s.length());      
+System.out.format("out_prep: |%s|\n",s);
+       return s;
     }
    /* *********************************************************************
     * Convert to payload byte array little endian
