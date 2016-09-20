@@ -5,6 +5,7 @@
  */
 package jcanpoll;
 
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
 /**
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 public class NewJFrame extends javax.swing.JFrame {
     public Canmsginfo cmi;
     public Canmsg2j cmsg;
+    public int seqsend;
     /**
      * Creates new form NewJFrame
      */
@@ -21,6 +23,7 @@ public class NewJFrame extends javax.swing.JFrame {
         initComponents();
         Canmsginfo c = new Canmsginfo(); cmi = c;
         Canmsg2j m = new Canmsg2j(); cmsg = m;
+        seqsend = 0;
     }
  
 
@@ -105,21 +108,21 @@ public class NewJFrame extends javax.swing.JFrame {
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, jTable1, org.jdesktop.beansbinding.ELProperty.create("${selectedElement.canidHex}"), jTextField2, org.jdesktop.beansbinding.BeanProperty.create("text"));
         bindingGroup.addBinding(binding);
 
-        jTextField3.setText("jTextField3");
+        jTextField3.setText("0");
         jTextField3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextField3ActionPerformed(evt);
             }
         });
 
-        jTextField4.setText("jTextField4");
+        jTextField4.setText("0x00");
         jTextField4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextField4ActionPerformed(evt);
             }
         });
 
-        jTextField5.setText("jTextField5");
+        jTextField5.setText("0x00");
         jTextField5.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextField5ActionPerformed(evt);
@@ -157,13 +160,14 @@ public class NewJFrame extends javax.swing.JFrame {
                         .addComponent(jLabel2)
                         .addGap(18, 18, 18)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(26, 26, 26)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 226, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addComponent(jTextField4, javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jTextField5, javax.swing.GroupLayout.Alignment.LEADING)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -184,11 +188,11 @@ public class NewJFrame extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jTextField4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3))
-                .addGap(12, 12, 12)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel4))
-                .addGap(0, 211, Short.MAX_VALUE))
+                .addGap(17, 17, 17)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel4)
+                    .addComponent(jTextField5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 206, Short.MAX_VALUE))
         );
 
         bindingGroup.bind();
@@ -219,7 +223,16 @@ public class NewJFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_jTable1MouseClicked
 
     private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
-              System.out.format("cmi: %s\t0x%08X %s\t%s\n",cmi.can_name,cmi.can_hex,cmi.descript_canid,cmi.can_msg_fmt);
+System.out.format("cmi: %s\t0x%08X %s\t%s\n",cmi.can_name,cmi.can_hex,cmi.descript_canid,cmi.can_msg_fmt);
+System.out.format("can_hex: %08X dlc: %d\n", cmi.can_hex.intValue(),cmsg.dlc);
+        cmsg.pb[0] = (byte)0xA5;
+        cmsg.id = cmi.can_hex.intValue();
+        cmsg.dlc = Integer.parseInt(jTextField3.getText());
+        String s = cmsg.out_prep();
+        System.out.format("Send: %s\n",s);
+        MessagePipeline pipe = MessagePipeline.getInstance();
+        pipe.WriteToSocket(s);
+
     }//GEN-LAST:event_jButton1MouseClicked
 
     private void jTextField1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTextField1MouseClicked
@@ -228,17 +241,36 @@ public class NewJFrame extends javax.swing.JFrame {
 
     private void jTextField3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField3ActionPerformed
         cmsg.dlc = Integer.parseInt(jTextField3.getText());
+        if (cmsg.dlc > 8) cmsg.dlc = 8;     // Limit payload size
+        jTextField3.setText(Integer.toString(cmsg.dlc));
         System.out.format("DLC entered %d\n",cmsg.dlc );
     }//GEN-LAST:event_jTextField3ActionPerformed
 
     private void jTextField4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField4ActionPerformed
-        // TODO add your handling code here:
+        String s = jTextField4.getText();
+        System.out.format("[0] str: %s\n",s);
+        int i = payloadParse(jTextField4.getText());
+        System.out.format("[0]: %d %X\n",i,i);
     }//GEN-LAST:event_jTextField4ActionPerformed
 
     private void jTextField5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField5ActionPerformed
-        // TODO add your handling code here:
+        String s = jTextField5.getText();
+        System.out.format("[0] str: %s\n",s);
+        int i = payloadParse(jTextField5.getText());
+        System.out.format("[0]: %d %X\n",i,i);
     }//GEN-LAST:event_jTextField5ActionPerformed
 
+    private int payloadParse(String s){
+        int i;
+        int k = s.indexOf("0x");
+        if (k < 0){
+            i = Integer.parseInt(s);
+        }else{
+            i = Integer.parseInt(s.substring(k+2), 16);
+        }
+        return i;
+    }
+   
     /**
      * @param args the command line arguments
      */

@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.Socket;
 import javax.swing.DefaultListModel;
 
@@ -96,9 +97,16 @@ public class Jcanpoll {
             BufferedReader in = 
             new BufferedReader(
                 new InputStreamReader(socket.getInputStream()));
+            OutputStreamWriter out = new OutputStreamWriter(socket.getOutputStream());
             Canmsg2j can1; 
             can1 = new Canmsg2j();    // Received CAN message
             DbPayload dbpay = new DbPayload();
+            
+// ===== socket communication ==================================================
+        MessagePipeline pipe = MessagePipeline.getInstance();
+        Thread pipeThread = new Thread(pipe);
+        pipeThread.start();//runs in background, not connected yet
+        pipe.connect(ip, port);
 
 // =====  Set up display windows ===============================================
            /* Create and display the form */
@@ -106,15 +114,7 @@ public class Jcanpoll {
         java.awt.EventQueue.invokeLater(() -> {
             new NewJFrame().setVisible(true);
             });
-//        ArrayList<String> aList = new ArrayList<String>();
-
-//        DefaultListModel<String> model = new DefaultListModel<String>();
-//        for(String s:aList){
-//        model.addElement(s);
-//        }
-        
         }
-        
             catch(SQLException e) {
             throw e;
         }
@@ -122,7 +122,5 @@ public class Jcanpoll {
         finally {
             if (pstmt != null) pstmt.close();
         }
-        
-//        System.out.format("DONE\n");
     }
 }
