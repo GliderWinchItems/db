@@ -6,8 +6,6 @@
 
 package jcanpoll;
 
-import com.sun.xml.internal.ws.util.StringUtils;
-import java.util.Comparator;
 import javax.xml.bind.DatatypeConverter;
 
 /**

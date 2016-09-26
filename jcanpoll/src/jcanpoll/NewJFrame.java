@@ -116,6 +116,17 @@ public class NewJFrame extends javax.swing.JFrame {
         binding = org.jdesktop.beansbinding.Bindings.createAutoBinding(org.jdesktop.beansbinding.AutoBinding.UpdateStrategy.READ_WRITE, jTable1, org.jdesktop.beansbinding.ELProperty.create("${selectedElement.canidHex}"), jTextField2, org.jdesktop.beansbinding.BeanProperty.create("text"));
         bindingGroup.addBinding(binding);
 
+        jTextField2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTextField2MouseClicked(evt);
+            }
+        });
+        jTextField2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField2ActionPerformed(evt);
+            }
+        });
+
         jTextField3.setText("0");
         jTextField3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -295,7 +306,7 @@ System.out.format("can_hex: %08X dlc: %d\n", cmi.can_hex.intValue(),cmsg.dlc);
     }//GEN-LAST:event_jButton1MouseClicked
 
     private void jTextField1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTextField1MouseClicked
-    
+        System.out.format("jTextField1MouseClicked:\n");
     }//GEN-LAST:event_jTextField1MouseClicked
 
     private void jTextField3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField3ActionPerformed
@@ -336,6 +347,16 @@ System.out.format("can_hex: %08X dlc: %d\n", cmi.can_hex.intValue(),cmsg.dlc);
 System.out.format("Hex: %08X Dec: %d input: %s\n",i,i,s);
         
     }//GEN-LAST:event_jTextField6ActionPerformed
+
+    private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
+
+    }//GEN-LAST:event_jTextField2ActionPerformed
+
+    private void jTextField2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTextField2MouseClicked
+       System.out.format("jTextField1MouseClicked: %s\n",jTextField2.getText());
+       cmi.can_hex = Long.parseLong(jTextField2.getText(), 16);
+       System.out.format("jTextField1MouseClicked: %08X\n",cmi.can_hex);
+    }//GEN-LAST:event_jTextField2MouseClicked
 
     private int payloadParse(String s){
         int i;
