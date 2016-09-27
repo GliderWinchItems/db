@@ -80,6 +80,18 @@ public class Canmsg2j {
     *        -5 = checksum error
     * *********************************************************************
      */
+      /**
+       * Check message for errors and Convert incoming ascii/hex CAN msg to an array of bytes
+    *   plus assemble the bytes comprising CAN ID into an int.
+    *   Return: 0 = OK;
+    *        -1 = message too short (less than 14)
+    *        -2 = message too long (greater than 30)
+    *        -3 = number of bytes not even
+    *        -4 = payload count is negative or greater than 8
+    *        -5 = checksum error
+       * @param msg
+       * @return 
+       */
    public int convert_msgtobin (String msg){
    /* msg = String with ascii/hex of a CAN msg */
     String x;
@@ -152,6 +164,11 @@ public class Canmsg2j {
     * Prepare CAN msg: Convert the array pb[] to hex and add checksum
     * The binary array pb[] is expected to have been set up.
     * ********************************************************************* */
+   /**
+    * Prepare CAN msg: Convert the array pb[] to hex and add checksum
+    * The binary array pb[] is expected to have been set up.
+    * @return 
+    */
     public String out_prep(){  // Convert payload bytes from byte array
         
        /* A return of 'null' indicates an error */
@@ -184,7 +201,11 @@ System.out.format("out_prep: |%s|\n",s);
    /* *********************************************************************
     * Convert to payload byte array little endian
     * ********************************************************************* */
-    private void out_int0(int n){
+    /**
+     * Convert to payload byte array little endian
+     * @param n 
+     */
+    public void out_int0(int n){
         pb[6] = (byte)(n & 0xff);
         pb[7] = (byte)((n >>  8) & 0xff);
         pb[8] = (byte)((n >> 16) & 0xff);
@@ -194,7 +215,11 @@ System.out.format("out_prep: |%s|\n",s);
    /* *********************************************************************
     * Convert to payload byte array little endian
     * ********************************************************************* */
-    private void out_int1(int n){
+    /**
+     * Convert to payload byte array little endian
+     * @param n 
+     */
+    public void out_int1(int n){
         pb[10] = (byte)(n & 0xff);
         pb[11] = (byte)((n >>  8) & 0xff);
         pb[12] = (byte)((n >> 16) & 0xff);
@@ -204,7 +229,11 @@ System.out.format("out_prep: |%s|\n",s);
    /* *********************************************************************
     * Convert long to payload byte array little endian
     * ********************************************************************* */
-    private void out_1long(long l){
+    /**
+     * Convert long to payload byte array little endian
+     * @param l 
+     */
+    public void out_1long(long l){
         pb[ 6] = (byte)( l & 0xff);
         pb[ 7] = (byte)((l >>  8) & 0xff);
         pb[ 8] = (byte)((l >> 16) & 0xff);
@@ -215,10 +244,26 @@ System.out.format("out_prep: |%s|\n",s);
         pb[13] = (byte)((l >> 56) & 0xff);
         dlc = 8;   // set payload count (dlc)
     }
+    /**
+     * Convert long to payload byte array little endian
+     * Variable number of bytes
+     * @param l // Bytes packed into a long 
+     * @param n // Payload size
+     */
+    public void out_1longvar(long l, int n){
+        for (int i = 0; i < n; i++){
+            pb[i+6] = (byte)((l >> (i * 8)) & 0xff);
+        }
+    }
    /* *********************************************************************
     * Convert shorts to payload byte array, little endian 
     * ********************************************************************* */
-    private boolean out_nshort(Short[] s){
+    /**
+     * Convert shorts to payload byte array, little endian
+     * @param s
+     * @return 
+     */
+    public boolean out_nshort(Short[] s){
         int x;
         x = s.length;
         if (x == 0){    // JIC
@@ -234,5 +279,4 @@ System.out.format("out_prep: |%s|\n",s);
         dlc = (x * 2);  // Set payload size
         return true;
     }
-    
 }
