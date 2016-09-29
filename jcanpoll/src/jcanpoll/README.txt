@@ -48,4 +48,16 @@ NOTES:
     are dropped by the sending of the msg (which is
     controlled by the dlc).
 
+4. Data entry notes
 
+   Dec, Hex, Float are distinguished by--
+   Dec = no '.' or '0x'
+   Hex = '0x' found
+   Float = '.' found
+   Note: Scientific notation can be use as long as there
+     is a '.', e.g. 1.5E-1 is acceptable.
+
+   The data in the text field is used whenever--
+   <Enter> is hit
+   Mouse exits the box (so passing the mouse over the box
+     re-enters what is there).

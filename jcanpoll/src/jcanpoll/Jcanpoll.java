@@ -14,6 +14,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import javax.swing.DefaultListModel;
+import javax.swing.SwingUtilities;
 
 /**
  *
@@ -25,6 +26,7 @@ public class Jcanpoll {
         private static String clientDriverName = "org.apache.derby.jdbc.ClientDriver";
         private static String databaseConnectionName = "jdbc:derby://localhost:1527/pcc";
         private static Object LocalDateTime;
+        
     /**
      * @param args the command line arguments
      * @throws java.sql.SQLException
@@ -106,8 +108,8 @@ public class Jcanpoll {
         MessagePipeline pipe = MessagePipeline.getInstance();
         Thread pipeThread = new Thread(pipe);
         pipeThread.start();//runs in background, not connected yet
-        pipe.connect(ip, port);
-
+        pipe.connect(ip, port);          
+                
 // =====  Set up display windows ===============================================
            /* Create and display the form */
         /* Create and display the form */

@@ -5,6 +5,8 @@
  */
 package jcanpoll;
 
+import javax.swing.SwingUtilities;
+
 /**
  *
  * @author deh
@@ -15,6 +17,9 @@ public class NewJFrame extends javax.swing.JFrame {
     public int seqsend;
     private Integer radio;
     private long payloadlong; // can hold 8 bytes of payload
+    
+    public static long canidrcv;
+
     /**
      * Creates new form NewJFrame
      */
@@ -23,9 +28,10 @@ public class NewJFrame extends javax.swing.JFrame {
         Canmsginfo c = new Canmsginfo(); cmi = c;
         Canmsg2j m = new Canmsg2j(); cmsg = m;
         seqsend = 0; radio = 0;payloadlong = 0;
-    }
+        radio = 1;
+        canidrcv = 0xE1E00000; // Test CAN ID
+   }
  
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -76,6 +82,7 @@ public class NewJFrame extends javax.swing.JFrame {
         jLabel15 = new javax.swing.JLabel();
         jLabel16 = new javax.swing.JLabel();
         jLabel17 = new javax.swing.JLabel();
+        jTextField11 = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -286,6 +293,8 @@ public class NewJFrame extends javax.swing.JFrame {
 
         jLabel17.setText("Dec|Hex");
 
+        jTextField11.setText("jTextField11");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -372,7 +381,9 @@ public class NewJFrame extends javax.swing.JFrame {
                                     .addComponent(jLabel15)))
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(91, 91, 91)
-                                .addComponent(jLabel17))))
+                                .addComponent(jLabel17)
+                                .addGap(126, 126, 126)
+                                .addComponent(jTextField11, javax.swing.GroupLayout.PREFERRED_SIZE, 410, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(254, 254, 254)
                         .addComponent(jLabel13)))
@@ -421,10 +432,15 @@ public class NewJFrame extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel15)
                     .addComponent(jLabel16))
-                .addGap(14, 14, 14)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel17)
-                    .addComponent(jRadioButton2))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(14, 14, 14)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel17)
+                            .addComponent(jRadioButton2)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTextField11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jTextField9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -483,7 +499,6 @@ System.out.format("###cmsg.dlc: %d\n",cmsg.dlc);
         System.out.format("Send: %s\n",s);
         MessagePipeline pipe = MessagePipeline.getInstance();
         pipe.WriteToSocket(s);
-
     }//GEN-LAST:event_jButton1MouseClicked
 
     private void jTextField1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTextField1MouseClicked
@@ -593,6 +608,10 @@ System.out.println("jTextField2MouseExited");
 System.out.println("jTextField6MouseExited");
         textField6cnv();
     }//GEN-LAST:event_jTextField6MouseExited
+
+    public static void setText11(String s){
+        jTextField11.setText(s);
+    }
 
     private long payloadParse(String s){
         long i;
@@ -750,6 +769,7 @@ System.out.format("Hex: %08X Dec: %d input: %s\n",payloadlong,payloadlong,s);
     private javax.swing.JTable jTable1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField10;
+    private static javax.swing.JTextField jTextField11;
     private javax.swing.JTextField jTextField2;
     private javax.swing.JTextField jTextField3;
     private javax.swing.JTextField jTextField4;

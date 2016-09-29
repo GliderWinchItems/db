@@ -9,6 +9,7 @@ import java.net.Socket;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Observer;
+import javax.swing.SwingUtilities;
 
 public class MessagePipeline implements Runnable {
     
@@ -19,6 +20,7 @@ public class MessagePipeline implements Runnable {
     private BufferedWriter writer;
     //private OutputStreamWriter writer;
     private String currentMessage = "";
+public String selectedMessage ="";    
     private static MessagePipeline instance = null;
     private boolean running = false;
     private boolean connected = false;
@@ -92,14 +94,27 @@ public class MessagePipeline implements Runnable {
 // Debug rcv          
 Canmsg2j cmsg = new Canmsg2j();
 cmsg.convert_msgtobin(s);
-if (cmsg.id == 0xE1E00000){
-System.out.format("ReadFromSocket: %s\n",s);
+if (cmsg.id == NewJFrame.canidrcv){
+   selectedMessage = s;
+   UpdateText11();
+   System.out.format("ReadFromSocket: %s\n",s);
 }
 
         } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
+public void UpdateText11(){
+    
+   SwingUtilities.invokeLater(
+      new Runnable(){
+      @Override
+      public void run(){
+            NewJFrame.setText11(selectedMessage);
+      }
+      });     
+ 
+}
     
     public void TEMPWriteToSocket(String s)
     {
