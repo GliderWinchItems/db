@@ -24,7 +24,7 @@ public class CanDisplay implements Comparable<CanDisplay>, Comparator<CanDisplay
     public int dlc; // Payload count (number of bytes in payload)
     public int p0;  // Assembled Integer of payload bytes [0]-[3]
     public int p1;  // Assembled Integer of payload bytes [4]-[7]
-    public long pl; // Assembled Long from payload bytes [0]-[7]
+    public long pl; // Assembled Long  from payload bytes [0]-[7]
     public byte[] pb;// Binary bytes as received and converted from ascii/hex input
     
     public CanDisplay(){

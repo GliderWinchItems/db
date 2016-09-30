@@ -91,14 +91,15 @@ public String selectedMessage ="";
             String s = reader.readLine();
             currentMessage = s;
 
-// Debug rcv          
-Canmsg2j cmsg = new Canmsg2j();
-cmsg.convert_msgtobin(s);
-if (cmsg.id == NewJFrame.canidrcv){
-   selectedMessage = s;
-   UpdateText11();
-   System.out.format("ReadFromSocket: %s\n",s);
-}
+        Canmsg2j cmsg = new Canmsg2j();
+        cmsg.convert_msgtobin(s);
+        // Check if this the selected CAN ID
+        if (cmsg.id == NewJFrame.canidrcv){
+            
+            selectedMessage = s;    // Save for Swing update
+            UpdateText11(); // Set invokeLater to run update
+            System.out.format("ReadFromSocket: %s\n",s);
+        }
 
         } catch (IOException ex) {
             ex.printStackTrace();
