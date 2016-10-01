@@ -5,6 +5,9 @@
  */
 package jcanpoll;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import javax.swing.SwingUtilities;
 
 /**
@@ -19,10 +22,12 @@ public class NewJFrame extends javax.swing.JFrame {
     private Integer radio;
     private long payloadlong; // can hold 8 bytes of payload
     
-    public static long canidrcv;
-
+    public static Long canidrcv;
+    public static int canidrcvi;
+    
     /**
      * Creates new form NewJFrame
+     * @param cib
      */
     public NewJFrame() {
         initComponents();
@@ -31,7 +36,8 @@ public class NewJFrame extends javax.swing.JFrame {
         Canmsg2j m = new Canmsg2j(); cmsg = m;
         seqsend = 0; radio = 0;payloadlong = 0;
         radio = 1;
-        canidrcv = 0xE1E00000; // Test CAN ID
+        canidrcv = 0x0000E1E00000L; // Test CAN ID
+        canidrcvi = canidrcv.intValue();
    }
  
     /**
@@ -312,6 +318,16 @@ public class NewJFrame extends javax.swing.JFrame {
         jLabel19.setText("Description");
 
         jTextField15.setText("jTextField15");
+        jTextField15.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                jTextField15MouseExited(evt);
+            }
+        });
+        jTextField15.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField15ActionPerformed(evt);
+            }
+        });
 
         jLabel20.setText("Msg Fmt");
 
@@ -482,15 +498,14 @@ public class NewJFrame extends javax.swing.JFrame {
                         .addComponent(jLabel10)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jTextField7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                 .addComponent(jLabel6)
                                 .addComponent(jRadioButton2))
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(42, 42, 42)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jTextField12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jTextField12, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jTextField13, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel19)
@@ -526,15 +541,19 @@ public class NewJFrame extends javax.swing.JFrame {
         int Row = jTable1.getSelectedRow();     // Selected Row (0 - n)
         if (radio == 1){
             setjTableSelection(cmi1);
-        }else{
+        }else{ // Here, radio button 2 active (receive selections)
             setjTableSelection(cmi2);
             jTextField12.setText(jTable1.getValueAt(Row, 1).toString());
             jTextField13.setText(jTable1.getValueAt(Row, 0).toString());
             jTextField14.setText(jTable1.getValueAt(Row, 2).toString());
             String ss = jTable1.getValueAt(Row, 3).toString();
             jTextField15.setText(ss);
-            canidrcv = Integer.parseUnsignedInt(jTable1.getValueAt(Row, 1).toString(), 16);
-//            canidrcv = 0xE1E00000;   // Remember sign extends
+            // Remember sign extends and will screw up table lookup
+            long l1 = Integer.parseUnsignedInt(jTable1.getValueAt(Row, 1).toString(), 16);
+            l1 = (l1 << 32) >>> 32; // Get rid of upper bits
+            canidrcv = l1;           // Needed for comparisons
+            canidrcvi = canidrcv.intValue();
+            cmi2.pay_type_code = Jcanpoll.lookUp(canidrcv);
 
         }
     }//GEN-LAST:event_jTable1MouseClicked
@@ -550,7 +569,9 @@ public class NewJFrame extends javax.swing.JFrame {
         
         /* Extract and Copy row-col selection */
         cmi.can_name = jTable1.getValueAt(Row, 0).toString();
-        cmi.can_hex = Long.parseLong(jTable1.getValueAt(Row, 1).toString(), 16);
+        long ltmp = Long.parseLong(jTable1.getValueAt(Row, 1).toString(), 16);
+        ltmp = (ltmp << 32) >>>32;  // Sign extension fix needed for comparisons
+        cmi.can_hex = ltmp;
         cmi.descript_canid = jTable1.getValueAt(Row, 2).toString();
         cmi.can_msg_fmt = jTable1.getValueAt(Row, 3).toString();
         System.out.format("cmi: %s\t0x%08X %s\t%s\n",cmi.can_name,cmi.can_hex,cmi.descript_canid,cmi.can_msg_fmt);
@@ -679,6 +700,19 @@ System.out.println("jTextField2MouseExited");
 System.out.println("jTextField6MouseExited");
         textField6cnv();
     }//GEN-LAST:event_jTextField6MouseExited
+
+    private void jTextField15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField15ActionPerformed
+        setTypeCode();
+    }//GEN-LAST:event_jTextField15ActionPerformed
+
+    private void jTextField15MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTextField15MouseExited
+        setTypeCode();
+    }//GEN-LAST:event_jTextField15MouseExited
+
+    public void setTypeCode(){
+//cmi2.pay_type_code = 24; // Test
+// TODO lookup Type Code given Type_Name
+    }
 
     public static void setText11(String s){
         jTextField11.setText(s);

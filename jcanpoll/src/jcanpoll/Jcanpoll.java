@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.util.Iterator;
 import javax.swing.DefaultListModel;
 import javax.swing.SwingUtilities;
 
@@ -26,6 +27,8 @@ public class Jcanpoll {
         private static String clientDriverName = "org.apache.derby.jdbc.ClientDriver";
         private static String databaseConnectionName = "jdbc:derby://localhost:1527/pcc";
         private static Object LocalDateTime;
+        
+        public static ArrayList<Canmsginfo> canidlist;
         
     /**
      * @param args the command line arguments
@@ -64,21 +67,19 @@ public class Jcanpoll {
             Integer totalct = 0;
             
 // ===== Fill ArrayList with database data =====================================
-            ArrayList<Canmsginfo> canidlist = new ArrayList<>();
+            Jcanpoll.canidlist = new ArrayList<>();
             CanmsginfoBuild cmib = new CanmsginfoBuild();
             cmib.genlist_Canid(stmt, canidlist);
-           
+                       
 // ===== Experimenting with constants
             PccConst pccconst = new PccConst();
             pccconst.fillList(stmt);
             
 // ===== Test/debugging search =================================================
-            long l1 = 0xE1C00000;   // Remember sign extends
-            l1 = (l1 << 32) >>> 32; // Get rid of upper bits
-            Long L1 = l1;           // Needed for comparisons
+            Long L1 = 0x0E1C00000L;           // Needed for comparisons
             Canmsginfo cmi2 = new Canmsginfo (L1); // CAN ID w remainder nulls
             int index = Collections.binarySearch(canidlist, cmi2); // Lookup
-            System.out.format("########### search test binarySearch: index: %d %08X\n",index, L1); 
+            System.out.format("####11####### search test binarySearch: index: %d %08X\n",index, L1); 
             
 // ===== Setup connection to socket ============================================
             String ip;
@@ -124,5 +125,21 @@ public class Jcanpoll {
         finally {
             if (pstmt != null) pstmt.close();
         }
+    }
+    public static int lookUp(Long L1){
+        Canmsginfo cmi7 = new Canmsginfo (L1); // CAN ID w remainder nulls
+        int index5 = Collections.binarySearch(canidlist , cmi7);
+        if (index5 < 0){ // When not found add a dummy to list
+            System.out.format("Type code lookup: CANID not in arraylist: %08X size: %s\n",cmi7.can_hex,canidlist.size());
+            return PccFinal.NONE; // Use default
+        }
+        System.out.format("Type code lookup: CANID found arraylist: %08X decript: %s code: %d  size: %d\n",
+                cmi7.can_hex, 
+                canidlist.get(index5).descript_payload,
+                canidlist.get(index5).pay_type_code,
+                canidlist.size());
+        Canmsginfo cmi9 = new Canmsginfo();
+        cmi9 = canidlist.get(index5);
+        return cmi9.pay_type_code;
     }
 }

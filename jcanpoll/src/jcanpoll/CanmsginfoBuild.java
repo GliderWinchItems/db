@@ -9,7 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collections;
 
 
 /**
@@ -17,10 +17,8 @@ import java.util.Iterator;
  * @author deh
  */
 public class CanmsginfoBuild {
-    ArrayList<Canmsginfo> canidlist;
  
     public CanmsginfoBuild(){
-                  ArrayList<Canmsginfo> canidlist = new ArrayList<Canmsginfo>();
     }
           
     public void genlist_Canid(Statement stmt, ArrayList canidlist) throws SQLException{
@@ -37,7 +35,7 @@ ORDER BY CANID.CANID_HEX;
        String query = "select CANID.*,PAYLOAD_TYPE.PAYLOAD_TYPE_CODE,PAYLOAD_TYPE.DESCRIPTION12  FROM CANID \n "
         + "JOIN PAYLOAD_TYPE \n"
                + "ON PAYLOAD_TYPE.PAYLOAD_TYPE_NAME = CANID.CAN_MSG_FMT \n"
-               + "ORDER BY CANID.CANID_NAME";
+               + "ORDER BY CANID.CANID_HEX";
         
             ResultSet rs;
             rs = stmt.executeQuery(query);            
@@ -45,14 +43,19 @@ ORDER BY CANID.CANID_HEX;
             
             // Extract result of database query (sorted order) and store in arraylist
             while (rs.next()) {
-                count += 1;
                 // Convert sql/db info into Canmsginfo
                 Canmsginfo cmi1 = new Canmsginfo ();
                 cmi1 = fillCanlist(rs);
-                System.out.format("%s\t0x%08X %3d %s\t%s %s\n",cmi1.can_name,cmi1.can_hex,cmi1.pay_type_code,cmi1.can_msg_fmt,cmi1.descript_canid,
+                System.out.format("%3d %s\t0x%08X %3d %s\t%s %s\n", count,
+                        cmi1.can_name,
+                        cmi1.can_hex,
+                        cmi1.pay_type_code,
+                        cmi1.can_msg_fmt,
+                        cmi1.descript_canid,
                         cmi1.descript_payload);
                 // Add Canmsginfo to ArrayList
-                canidlist.add (new Canmsginfo(cmi1));
+                canidlist.add(cmi1);
+                count += 1;
             }
             System.out.format("\n/* TOTAL COUNT = %d  */\n\n",count);
             // List array and check the count (debugging)
@@ -83,8 +86,9 @@ ORDER BY CANID.CANID_HEX;
         );
         return cmi;
     }
+ 
         
-        
+ 
         
          
     

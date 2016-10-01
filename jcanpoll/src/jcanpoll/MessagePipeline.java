@@ -19,8 +19,11 @@ public class MessagePipeline implements Runnable {
     private BufferedReader reader;
     private BufferedWriter writer;
     //private OutputStreamWriter writer;
+    
     private String currentMessage = "";
-public String selectedMessage ="";    
+    public  String selectedMessage ="";    
+    public  static Canmsg2j cmsg;
+    
     private static MessagePipeline instance = null;
     private boolean running = false;
     private boolean connected = false;
@@ -94,8 +97,9 @@ public String selectedMessage ="";
         Canmsg2j cmsg = new Canmsg2j();
         cmsg.convert_msgtobin(s);
         // Check if this the selected CAN ID
-        if (cmsg.id == NewJFrame.canidrcv){
-            
+        if (cmsg.id == NewJFrame.canidrcvi){
+            PayloadDisplay pld = new PayloadDisplay();
+            s = pld.toString(cmsg, NewJFrame.cmi2);
             selectedMessage = s;    // Save for Swing update
             UpdateText11(); // Set invokeLater to run update
             System.out.format("ReadFromSocket: %s\n",s);

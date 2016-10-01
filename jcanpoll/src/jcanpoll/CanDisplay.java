@@ -45,6 +45,10 @@ public class CanDisplay implements Comparable<CanDisplay>, Comparator<CanDisplay
         this.can_hex    = id;
         this.cmi.can_name = s;
     }
+    public CanDisplay(Canmsg2j can,Canmsginfo c ){
+        this.cmi = c;
+        cmsg = new Canmsg2j();
+    }
     public void setCount(Integer ct){
         count = ct;
     }
