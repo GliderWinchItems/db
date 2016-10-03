@@ -21,7 +21,9 @@ public class MessagePipeline implements Runnable {
     //private OutputStreamWriter writer;
     
     private String currentMessage = "";
-    public  String selectedMessage ="";    
+    public  String selectedMessage ="";     // GUI: Formatted payload
+    public  String selectedMessage2 = "";   // GUI: DLC field
+    public  String selectedMessage3 = "";   // GUI: Payload field (raw hex)
     public  static Canmsg2j cmsg;
     
     private static MessagePipeline instance = null;
@@ -100,7 +102,13 @@ public class MessagePipeline implements Runnable {
         if (cmsg.id == NewJFrame.canidrcvi){
             PayloadDisplay pld = new PayloadDisplay();
             s = pld.toString(cmsg, NewJFrame.cmi2);
-            selectedMessage = s;    // Save for Swing update
+            selectedMessage  = s;    // Save for Swing update
+            selectedMessage2 = String.format("%d",cmsg.dlc);
+            selectedMessage3 = "";
+            for (int i = 6; i < cmsg.dlc+6; i++){
+                selectedMessage3 = selectedMessage3 + 
+                        String.format("%02X ",cmsg.pb[i]);
+            }
             UpdateText11(); // Set invokeLater to run update
             System.out.format("ReadFromSocket: %s\n",s);
         }
@@ -115,7 +123,10 @@ public void UpdateText11(){
       new Runnable(){
       @Override
       public void run(){
-            NewJFrame.setText11(selectedMessage);
+            NewJFrame.setText11(
+                    selectedMessage,
+                    selectedMessage2,
+                    selectedMessage3);
       }
       });     
  
