@@ -144,6 +144,7 @@ public class NewJFrame extends javax.swing.JFrame {
             }
         });
 
+        jTextField2.setText("0");
         jTextField2.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jTextField2MouseClicked(evt);
