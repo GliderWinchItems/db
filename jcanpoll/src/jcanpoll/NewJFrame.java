@@ -5,6 +5,8 @@
  */
 package jcanpoll;
 
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author deh
@@ -599,12 +601,12 @@ System.out.println("jTextField4ActionPerformed");
 
     private void jTextField5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField5ActionPerformed
  System.out.println("jTextField5ActionPerformed");
-        textField5cnv();
+//        textField5cnv();
     }//GEN-LAST:event_jTextField5ActionPerformed
 
     private void jTextField6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField6ActionPerformed
 System.out.println("jTextField6ActionPerformed");
-        textField6cnv();
+  //      textField6cnv();
     }//GEN-LAST:event_jTextField6ActionPerformed
 
     private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
@@ -682,13 +684,15 @@ System.out.println("jTextField10MouseExited");
 
     private void jTextField2MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTextField2MouseExited
 System.out.println("jTextField2MouseExited");
-        cmi1.can_hex = Long.parseLong(jTextField2.getText(), 16);
+//        cmi1.can_hex = Long.parseLong(jTextField2.getText(), 16);
+        cmi1.can_hex = parseLongChkHex(jTextField2.getText());
+        
        System.out.format("jTextField1MouseClicked: %08X\n",cmi1.can_hex);
     }//GEN-LAST:event_jTextField2MouseExited
 
     private void jTextField6MouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTextField6MouseExited
 System.out.println("jTextField6MouseExited");
-        textField6cnv();
+        //textField6cnv();
     }//GEN-LAST:event_jTextField6MouseExited
 
     private void jTextField15ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField15ActionPerformed
@@ -720,14 +724,49 @@ System.out.println("jTextField7ActionPerformed");
         jTextField5.setText(s2);
         jTextField6.setText(s3);
     }
-
+   private Integer parseIntChk(String s){
+        Integer i;
+        try{
+            i = Integer.parseInt(s);
+        }catch (NumberFormatException e){
+            System.out.println("Parse Int failed\n");
+            JOptionPane.showMessageDialog(null, e.toString(), "Not Decimal",
+                                    JOptionPane.ERROR_MESSAGE);
+            i = 0;
+        }
+        return i;
+    }
+      private long parseLongChkDec(String s){
+        long i;
+        try{
+            i = Long.parseLong(s);
+        }catch (NumberFormatException e){
+            System.out.println("Parse long failed\n");
+            JOptionPane.showMessageDialog(null, e.toString(), "Not Decimal",
+                                    JOptionPane.ERROR_MESSAGE);
+            i = 0;
+        }
+        return i;
+    }
+    private long parseLongChkHex(String s){
+        long i;
+        try{
+            i = Long.parseLong(s, 16);
+        }catch (NumberFormatException e){
+            System.out.println("Parse Int failed\n");
+            JOptionPane.showMessageDialog(null, e.toString(), "Not H",
+                                    JOptionPane.ERROR_MESSAGE);
+            i = 0;
+        }
+        return i;
+    }
     private long payloadParse(String s){
         long i;
         int k = s.indexOf("0x");
         if (k < 0){
-            i = Long.parseLong(s);
+            i = parseLongChkDec(s);
         }else{
-            i = Long.parseLong(s.substring(k+2), 16);
+            i = parseLongChkHex(s.substring(k+2));
         }
         return i;
     }
@@ -765,8 +804,11 @@ System.out.println("jTextField7ActionPerformed");
         }
         return i;
     }
+    
+ 
     private void textField3cnvt(){
-        cmsg.dlc = Integer.parseInt(jTextField3.getText());
+        //cmsg.dlc = Integer.parseInt(jTextField3.getText());
+        cmsg.dlc = parseIntChk(jTextField3.getText());
         if (cmsg.dlc > 8) cmsg.dlc = 8;     // Limit payload size
         jTextField3.setText(Integer.toString(cmsg.dlc));
         System.out.format("DLC entered %d\n",cmsg.dlc );

@@ -41,7 +41,7 @@ public class Jcanpoll {
        Connection connection = null;
         PreparedStatement pstmt = null;
         Statement stmt = null;
-        
+  
                   //Check for DB drivers
         try{
             Class.forName(clientDriverName);
