@@ -18,4 +18,5 @@ public class PccFinal {
     public static final int U8         = 23; //[0]: uint8_t');
     public static final int UNIXTIME   = 24; //[0]: U8_U32 with U8 bit field stuff
     public static final int UNDEF      =255; //Undefined
+    public static final int U8_U8_U32  = 15; //	6, ' [0]:[1]:[2]-[5]: uint8_t[0],uint8_t[1],uint32_t,');
 }

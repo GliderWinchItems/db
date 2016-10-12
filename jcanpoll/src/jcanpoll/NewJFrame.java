@@ -388,11 +388,8 @@ public class NewJFrame extends javax.swing.JFrame {
                                         .addComponent(jLabel14))
                                     .addComponent(jTextField10, javax.swing.GroupLayout.PREFERRED_SIZE, 285, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jLabel13)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(jLabel8))
-                                        .addGap(55, 55, 55)))
+                                    .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel8))
                                 .addGap(41, 41, 41)))
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jTextField7, javax.swing.GroupLayout.PREFERRED_SIZE, 502, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -446,10 +443,11 @@ public class NewJFrame extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(13, 13, 13)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jRadioButton2)
-                                    .addComponent(jRadioButton1)
-                                    .addComponent(jTextField12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jRadioButton2, javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jRadioButton1)
+                                        .addComponent(jTextField12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                             .addGroup(layout.createSequentialGroup()
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(jTextField13, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -508,11 +506,9 @@ public class NewJFrame extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                     .addComponent(jLabel4)
-                                    .addComponent(jLabel5))
-                                .addContainerGap(105, Short.MAX_VALUE))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel3)
-                        .addContainerGap())))
+                                    .addComponent(jLabel5)))))
+                    .addComponent(jLabel3))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         bindingGroup.bind();
@@ -805,7 +801,6 @@ System.out.println("jTextField7ActionPerformed");
         return i;
     }
     
- 
     private void textField3cnvt(){
         //cmsg.dlc = Integer.parseInt(jTextField3.getText());
         cmsg.dlc = parseIntChk(jTextField3.getText());
@@ -816,14 +811,15 @@ System.out.println("jTextField7ActionPerformed");
     private void textField4cnv(){
         String s = jTextField4.getText();
         System.out.format("[0] str: %s\n",s);
-        long l = payloadParse(jTextField4.getText()) & 0xff;
+        long l = payloadParse(s) & 0xff;
         payloadlong = (payloadlong & ~0xff) | l; // Mask old data or new
         System.out.format("[0]: %d %X\n",payloadlong,payloadlong);
+        jTextField8.setText(s); // Duplicate other [0] field
     }
     private void textField5cnv(){
         String s = jTextField5.getText();
         System.out.format("[0] str: %s\n",s);
-        long l = payloadParse(jTextField5.getText()) & 0xff;
+        long l = payloadParse(s) & 0xff;
         payloadlong = (payloadlong & ~0xff00) | (l << 8); // Mask old data or new
         System.out.format("[0]: %d %X\n",payloadlong,payloadlong);
     }
@@ -835,9 +831,11 @@ System.out.println("jTextField7ActionPerformed");
 System.out.format("Hex: %08X Dec: %d input: %s\n",payloadlong,payloadlong,s);
     }
     private void textField8cnv(){
-        long l = payloadParse(jTextField8.getText()) & 0xff;
+        String s = jTextField8.getText();
+        long l = payloadParse(s) & 0xff;
         payloadlong = (payloadlong & ~0xff) | l; // Mask old data or new
-        System.out.format("[0]: %d %X\n",payloadlong,payloadlong);       // TODO add your handling code here 
+        System.out.format("[0]: %d %X\n",payloadlong,payloadlong); 
+        jTextField4.setText(s); // Duplicate other [0] field
     }
     private void textFile9cnv(){
         String s = jTextField9.getText();
@@ -849,7 +847,7 @@ System.out.format("Hex: %08X Dec: %d input: %s\n",payloadlong,payloadlong,s);
     private void textField10cnv(){
         String s = jTextField10.getText();
         payloadlong = fieldCnvt(s);   // Convert dec,hex,or float to raw bits
-System.out.format("Hex: %08X Dec: %d input: %s\n",payloadlong,payloadlong,s);     // TODO add your handling code here:
+System.out.format("Hex: %08X Dec: %d input: %s\n",payloadlong,payloadlong,s); 
     }
 
     

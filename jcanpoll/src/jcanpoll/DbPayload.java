@@ -38,13 +38,26 @@ public class DbPayload {
                          s  += String.format("ERR U8_U32: dlc not eq 5 %d: ",cd.dlc);
                          break;
                 }
-                s  += String.format("%d: %02X: ",cd.dlc,cd.pb[6]  );
-                    for (int i = 7 ; i < cd.dlc+6; i++){
+                s  += String.format("%d: %d: %d ",cd.dlc,cd.pb[6], cd.pb[7]  );
+                for (int i = 8 ; i < cd.dlc+7; i++){
                     s += String.format("%02x ",cd.pb[i]);
                 }
                 cmsg.in_1int_n(1);
                 s += String.format("%8d",cmsg.p0);
                 break;
+                
+            case PccFinal.U8_U8_U32: // U8_U32:
+                if (cd.dlc != 6){
+                         s  += String.format("ERR U8_U8_U32: dlc not eq 6 %d: ",cd.dlc);
+                         break;
+                }
+                s  += String.format("%d: %d:  %d: ",cd.dlc,cd.pb[6], cd.pb[7]  );
+                for (int i = 9 ; i < cd.dlc+7; i++){
+                    s += String.format("%02x ",cd.pb[i]);
+                }
+                cmsg.in_1int_n(2);
+                s += String.format(":%8d",cmsg.p0);
+                break;               
                 
             case PccFinal.LAT_LON_HT:
                 if (cd.dlc != 6){
