@@ -541,9 +541,8 @@ public class NewJFrame extends javax.swing.JFrame {
             canidrcv = l1;           // Needed for comparisons in binary search
             canidrcvi = canidrcv.intValue();
             cmi2.pay_type_code = Jcanpoll.lookUp(canidrcv);// name -> numeric code
-            canmsgct = 0; 
-
         }
+        zeroRcvFields();
     }//GEN-LAST:event_jTable1MouseClicked
 
     private void setjTableSelection(Canmsginfo cmi){
@@ -707,8 +706,16 @@ System.out.println("jTextField7MouseExited");
 System.out.println("jTextField7ActionPerformed");
     }//GEN-LAST:event_jTextField7ActionPerformed
 
+    private void zeroRcvFields(){
+        jTextField5.setText("0");
+        jTextField6.setText("0");
+        jTextField11.setText("0");
+        jTextField16.setText("0");
+        canmsgct = 0;   // Count received CAN msgs
+    }
+    
     public void setTypeCode(){
-//cmi2.pay_type_code = 24; // Test
+//cmi2.pay_type_code = 24; // ## Test/Debug ##
 // TODO lookup Type Code given Type_Name
     }
 
