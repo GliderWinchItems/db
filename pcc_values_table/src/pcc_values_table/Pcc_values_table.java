@@ -261,7 +261,11 @@ tmpsave = tmp;
                 Integer x = 0; 
                 String y = getCANID(stmt2, val);
                 count += 1;
-                System.out.format("{%4d,  0x%s }, /* %3d ",rs.getInt("FUNCTION_TYPE_CODE"),y, count);
+                int ftc = rs.getInt("FUNCTION_TYPE_CODE");
+                String cmd_ir = rs.getString("CMD_IR");
+                if ("R".equals(cmd_ir))
+                    ftc += 1000;
+                System.out.format("{%4d,  0x%s }, /* %3d ",ftc,y, count);
                 System.out.format("%-18s ",rs.getString("CAN_UNIT_NAME"));
                 System.out.format("  %s\t", val);
                 System.out.format(" %-30s*/\n",rs.getString("DESCRIPTION7"));
