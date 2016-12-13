@@ -1,0 +1,18 @@
+
+Notes on operation
+
+1.  hub-server or socat need to be running before starting this program.
+   
+2.  Command line provision: ID address and port.
+    No command line arguments defaults to: 127.0.0.1 32123
+
+3.  Derby server needs to be running and connected to the parameter database
+    'pcc' before starting the program.
+
+4.  When database table appears click on names (leftmost column) to sort, and
+    select CAN IDs used for the PC and MC sides of the transfer--
+    click to select 
+      'MCLI'
+    click radio button 'Receive select'
+    click to select
+      'MCLR'
