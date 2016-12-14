@@ -140,13 +140,13 @@ public class Pcc_defines {
                 }
                 count += 1;
             }
-            System.out.format("public final static int CANID_COUNT = %d\n",count);
+            System.out.format("public final static int CANID_COUNT = %d;\n",count);
             
             rs = stmt.executeQuery(query);
             
             while (rs.next()) {
                 System.out.format("public static final int " + "%-24s",rs.getString("CANID_NAME"));
-                System.out.format("= 0x%-10s",        rs.getString("CANID_HEX"));
+                System.out.format("= 0x%-8s;  ",        rs.getString("CANID_HEX"));
                 System.out.format("// " + "%-15s: ", rs.getString("CANID_TYPE"));
                 System.out.format("%s" + "\n",       rs.getString("DESCRIPTION"));
             }
@@ -159,13 +159,13 @@ public class Pcc_defines {
             rs = stmt.executeQuery(query);
             Integer count = 0;
             while (rs.next()) {count += 1;}
-            System.out.format("\npublic static final NUMBER_TYPE_COUNT = %d\n",count);
+            System.out.format("\npublic static final int NUMBER_TYPE_COUNT = %d;\n",count);
             
             rs = stmt.executeQuery(query);
             
              while (rs.next()) {
-                 System.out.format("public static final  " + "%-24s",rs.getString("TYPE_NAME"));
-                 System.out.format("= %-10s",rs.getString("TYPE_CODE"));
+                 System.out.format("public static final int " + "%-24s",rs.getString("TYPE_NAME"));
+                 System.out.format("= %d;\t",rs.getInt("TYPE_CODE"));
                  System.out.format("// " + "%-12s",rs.getString("TYPE_CT"));
                  System.out.format("%s" + "\n",rs.getString("DESCRIPTION9"));
              }
@@ -178,13 +178,13 @@ public class Pcc_defines {
             rs = stmt.executeQuery(query);
             Integer count = 0;
             while (rs.next()) {count += 1;}
-            System.out.format("\npublic static final CMD_CODES_COUNT = %d\n",count);
+            System.out.format("\npublic static final int CMD_CODES_COUNT = %d;\n",count);
             
             rs = stmt.executeQuery(query);
             
              while (rs.next()) {
-                 System.out.format("public static final  " + "%-24s",rs.getString("CMD_CODE_NAME"));
-                 System.out.format("= %-10s",rs.getString("CMD_CODE_NUMBER"));
+                 System.out.format("public static final int " + "%-24s",rs.getString("CMD_CODE_NAME"));
+                 System.out.format("= %d;\t",rs.getInt("CMD_CODE_NUMBER"));
                  System.out.format("// " + "%-12s\n",rs.getString("DESCRIPTION4"));
              }
              return count;
@@ -196,13 +196,13 @@ public class Pcc_defines {
             rs = stmt.executeQuery(query);
             Integer count = 0;
             while (rs.next()) {count += 1;}
-            System.out.format("\npublic static final PAYLOAD_TYPE_COUNT = %d\n",count);
+            System.out.format("\npublic static final int PAYLOAD_TYPE_COUNT = %d;\n",count);
             
             rs = stmt.executeQuery(query);
             
             while (rs.next()) {
-                System.out.format("public static final  " + "%-24s",rs.getString("PAYLOAD_TYPE_NAME"));
-                System.out.format("= -10s",             rs.getString("PAYLOAD_TYPE_CODE"));
+                System.out.format("public static final int " + "%-24s",rs.getString("PAYLOAD_TYPE_NAME"));
+                System.out.format("= %d;\t",             rs.getInt("PAYLOAD_TYPE_CODE"));
                 System.out.format("// " + "%-48s\n",     rs.getString("DESCRIPTION12"));
             }
             return count;
@@ -217,7 +217,7 @@ public class Pcc_defines {
             Integer count1 = 0;
             Integer flag = 0;
             while (rs.next()) {count += 1;}
-            System.out.format("\npublic static final PARAM_LIST_COUNT = %d\t// TOTAL COUNT OF PARAMETER LIST\n\n",count);
+            System.out.format("\npublic static final int PARAM_LIST_COUNT = %d;\t// TOTAL COUNT OF PARAMETER LIST\n\n",count);
             
             rs = stmt.executeQuery(query);
             String old = "";
@@ -229,17 +229,17 @@ public class Pcc_defines {
                     if (flag == 0){
                         flag = 1;
                     }else{
-                        System.out.format("\npublic static final PARAM_LIST_CT_%s\t%d\t// Count of same FUNCTION_TYPE in preceding list\n\n",old, count1);
+                        System.out.format("\npublic static final int PARAM_LIST_CT_%s\t= %d;\t// Count of same FUNCTION_TYPE in preceding list\n\n",old, count1);
                         count1 = 0;
                     }
                 }
                 old = tmp;
-                System.out.format("public static final  " + "%-24s\t",rs.getString("PARAM_NAME"));
-                System.out.format("= %-10s",                rs.getString("PARAM_CODE"));
+                System.out.format("public static final int " + "%-24s\t",rs.getString("PARAM_NAME"));
+                System.out.format("= %d;\t",                rs.getInt("PARAM_CODE"));
                 System.out.format("// " + "%-48s\n",      rs.getString("DESCRIPTION10"));
                 count1 += 1;
             }
-            System.out.format("\npublic static final PARAM_LIST_CT_%s\t%d\t// Count of same FUNCTION_TYPE in preceding list\n\n",old, count1);            
+            System.out.format("\npublic static final int PARAM_LIST_CT_%s\t= %d;\t// Count of same FUNCTION_TYPE in preceding list\n\n",old, count1);            
             return count;
         }    
        
@@ -250,13 +250,13 @@ public class Pcc_defines {
             rs = stmt.executeQuery(query);
             Integer count = 0;
             while (rs.next()) {count += 1;}
-            System.out.format("\npublic static final READINGS_LIST_COUNT = %d\n",count);
+            System.out.format("\npublic static final int READINGS_LIST_COUNT = %d;\n",count);
             
             rs = stmt.executeQuery(query);
             
             while (rs.next()) {
-                System.out.format("public static final  " + "%-24s\t",rs.getString("READINGS_NAME"));
-                System.out.format("= %-10s",                rs.getString("READINGS_CODE"));
+                System.out.format("public static final int " + "%-24s\t",rs.getString("READINGS_NAME"));
+                System.out.format("= %d;\t",                rs.getInt("READINGS_CODE"));
                 System.out.format("// " + "%-48s\n",      rs.getString("DESCRIPTION16"));
             }
             return count;
@@ -268,13 +268,13 @@ public class Pcc_defines {
             rs = stmt.executeQuery(query);
             Integer count = 0;
             while (rs.next()) {count += 1;}
-            System.out.format("\npublic static final FUNC_BIT_PARAM_COUNT = %d\n",count);
+            System.out.format("\npublic static final int FUNC_BIT_PARAM_COUNT = %d;\n",count);
             
             rs = stmt.executeQuery(query);
             
             while (rs.next()) {
-                System.out.format("public static final  " + "%-24s\t",rs.getString("FUNC_BIT_PARAM_NAME"));
-                System.out.format("= %-10s",                rs.getString("FUNC_BIT_PARAM_VAL"));
+                System.out.format("public static final int " + "%-24s\t",rs.getString("FUNC_BIT_PARAM_NAME"));
+                System.out.format("= %s;\t",                rs.getString("FUNC_BIT_PARAM_VAL"));
                 System.out.format("// " + "%-20s",        rs.getString("FUNCTION_TYPE"));
                 System.out.format("%-48s\n",              rs.getString("DESCRIPTION5"));
             }
@@ -287,13 +287,13 @@ public class Pcc_defines {
             rs = stmt.executeQuery(query);
             Integer count = 0;
             while (rs.next()) {count += 1;}
-            System.out.format("\npublic static final CANUNIT_COUNT = %d\n",count);
+            System.out.format("\npublic static final int CANUNIT_COUNT = %d;\n",count);
             
             rs = stmt.executeQuery(query);
             
             while (rs.next()) {
-                System.out.format("public static final  " + "%-24s\t",rs.getString("CAN_UNIT_NAME"));
-                System.out.format("= %-10s",                rs.getString("CAN_UNIT_CODE"));
+                System.out.format("public static final int " + "%-24s\t",rs.getString("CAN_UNIT_NAME"));
+                System.out.format("= %-10s;",                rs.getString("CAN_UNIT_CODE"));
                 System.out.format("// " + "%-20s",        rs.getString("CANID_NAME"));
                 System.out.format("%-48s\n",              rs.getString("DESCRIPTION3"));
             }
@@ -306,13 +306,13 @@ public class Pcc_defines {
             rs = stmt.executeQuery(query);
             Integer count = 0;
             while (rs.next()) {count += 1;}
-            System.out.format("\npublic static final FUNCTION_TYPE_COUNT = %d\n",count);
+            System.out.format("\npublic static final int FUNCTION_TYPE_COUNT = %d;\n",count);
             
             rs = stmt.executeQuery(query);
             
             while (rs.next()) {
-                System.out.format("public static final  FUNCTION_TYPE_" + "%-24s\t",rs.getString("FUNCTION_TYPE"));
-                System.out.format("= %-10s",                rs.getInt("FUNCTION_TYPE_CODE"));
+                System.out.format("public static final int FUNCTION_TYPE_" + "%-24s\t",rs.getString("FUNCTION_TYPE"));
+                System.out.format("= %d;\t",                rs.getInt("FUNCTION_TYPE_CODE"));
                 System.out.format("// " + "%-48s\n",              rs.getString("DESCRIPTION8"));
             }
             return count;
@@ -324,13 +324,13 @@ public class Pcc_defines {
             rs = stmt.executeQuery(query);
             Integer count = 0;
             while (rs.next()) {count += 1;}
-            System.out.format("\n#define READINGS_BOARD_COUNT = %d\n",count);
+            System.out.format("\n#define READINGS_BOARD_COUNT = %d;\n",count);
             
             rs = stmt.executeQuery(query);
             
             while (rs.next()) {
-                System.out.format("public static final  " + "%-24s\t",rs.getString("READINGS_BOARDNAME"));
-                System.out.format("= %-10s",                rs.getInt("READINGS_BOARDCODE"));
+                System.out.format("public static final int " + "%-24s\t",rs.getString("READINGS_BOARDNAME"));
+                System.out.format("= %d;\t",                rs.getInt("READINGS_BOARDCODE"));
                 System.out.format("// " + "%-48s\n",              rs.getString("DESCRIPTION15"));
             }
             return count;
@@ -342,12 +342,12 @@ public class Pcc_defines {
             rs = stmt.executeQuery(query);
             Integer count = 0;
             while (rs.next()) {count += 1;}
-            System.out.format("\npublic static final  MISC_SYS_COUNT = %d\n",count);
+            System.out.format("\npublic static final int MISC_SYS_COUNT = %d;\n",count);
             
             rs = stmt.executeQuery(query);
             
             while (rs.next()) {
-                System.out.format("public static final   " + "%-24s =\t",rs.getString("MISC_SYS_NAME"));
+                System.out.format("public static final int  " + "%-24s =\t",rs.getString("MISC_SYS_NAME"));
                 String s = rs.getString("MISC_SYS_FMT");    // Type of value (e.g. int, float)
                 String u = rs.getString("MISC_SYS_VAL");
                 switch (s)
@@ -355,7 +355,7 @@ public class Pcc_defines {
                 case "TYPE_U32": // Unsigned int
   
                     Integer x = Integer.parseInt(u);
-                    System.out.format("\t%d",x);
+                    System.out.format("\t= %d;",x);
                     break;
                 default:
                     System.out.format("\t%s // ### ERROR Value Conversion not made ####", u);
